@@ -1,0 +1,29 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../plugin.css';
+
+@layer components {
+
+    /* Firefox */
+    .fi-sidebar-nav {
+        scrollbar-width: thin;
+        scrollbar-color: theme('colors.primary.400') theme('colors.primary.50');
+    }
+
+    /* Chrome, Edge, and Safari */
+    .fi-sidebar-nav::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .fi-sidebar-nav::-webkit-scrollbar-track {
+        background: theme('colors.primary.50');
+        border-radius: 5px;
+    }
+
+    .fi-sidebar-nav::-webkit-scrollbar-thumb {
+        background-color: theme('colors.primary.400');
+        border-radius: 5px;
+        border: 3px solid var(--primary);
+    }
+}
+
+@config './tailwind.config.js';
