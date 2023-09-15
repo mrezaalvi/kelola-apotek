@@ -19,12 +19,16 @@ class Satuan extends Model
     public function nama(): Attribute
     {
         return new Attribute(
-            set: fn($value) => Str::upper($value), 
+            set: fn($value) => Str::of($value)->trim()->upper(), 
         );
     }
 
     public function produks(): HasMany{
         return $this->hasMany(Produk::class);
+    }
+
+    public function multiSatuan(): HasMany{
+        return $this->hasMany(MultiSatuan::class);
     }
 
     public function createdBy(): BelongsTo

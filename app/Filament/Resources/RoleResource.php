@@ -48,8 +48,9 @@ class RoleResource extends Resource
                         //     ->relationship('permissions', 'alias')
                         //     ->searchable()
                         //     ->preload(),
-                        Components\PermissionList::make('permissions')
+                        Forms\Components\Select::make('permissions')
                             ->label('Izin Akses')
+                            ->multiple()
                             ->relationship(
                                 'permissions',
                                 titleAttribute: 'alias',

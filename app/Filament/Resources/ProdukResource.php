@@ -8,7 +8,9 @@ use App\Models\Produk;
 use App\Models\Satuan;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\ProdukResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Wallo\FilamentSelectify\Components\ButtonGroup;
@@ -62,13 +64,14 @@ class ProdukResource extends Resource
                                     ->relationship('satuan', 'nama')
                                     ->searchable()
                                     ->preload()
-                                    ->live()
+                                    ->live(onBlur: true)
                                     ->createOptionForm([
                                         Forms\Components\TextInput::make('nama')
                                             ->unique(ignoreRecord: true)
                                             ->required(),
                                     ]),
                                 Forms\Components\Select::make('kategories')
+                                    ->label('Kategori')
                                     ->multiple()
                                     ->relationship('kategories', 'nama')
                                     ->searchable()
@@ -80,12 +83,18 @@ class ProdukResource extends Resource
                                     ]),
                             ]),
                         Forms\Components\Repeater::make('multiSatuan')
+                            ->relationship()
                             ->schema([
                                 Forms\Components\Grid::make()
                                     ->schema([
-                                        Forms\Components\Select::make('satuan_id')
+                                        Forms\Components\Select::make('satuan_lanjutan')
                                             ->label('Satuan Lanjutan')
-                                            ->relationship('satuan', 'nama')
+                                            ->relationship(
+                                                'satuan', 
+                                                'nama',
+                                                fn(Builder $query, Forms\Get $get) 
+                                                    => $query->where('id', '!=', $get('../../satuan')) 
+                                            )
                                             ->searchable()
                                             ->preload()
                                             ->createOptionForm([
@@ -97,11 +106,13 @@ class ProdukResource extends Resource
                                             ->label('Nilai Konversi')
                                             ->placeholder('0')
                                             ->extraInputAttributes(['class' => 'text-end'])
-                                            ->suffix(fn(Forms\Get $get)=>$get('satuan_id')?$get('satuan_id'):'satuan'),
+                                            ->suffix(
+                                                fn(Forms\Get $get)=>
+                                                    $get('../../satuan')?Satuan::find($get('../../satuan'))->nama:'satuan'),
                                     ]),  
                             ])
                             ->defaultItems(0)
-                            ->disabled(fn(Forms\Get $get)=>!$get('satuan_id'))
+                            ->disabled(fn(Forms\Get $get)=>!$get('satuan'))
                             ->reorderable(false)
                             ->reorderableWithButtons(),
 
@@ -139,7 +150,7 @@ class ProdukResource extends Resource
                                     ->disabled(fn(Forms\Get $get)=>!$get('use_margin'))
                                     ->placeholder('0,00')
                                     ->suffix('%')
-                                    ->afterStateUpdated(function (Forms\Set $set, Get $get, ?string $state) {
+                                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
                                         if($get('harga_beli')){
                                             $hargaBeli = floatval($get('harga_beli'));
                                             $marginHarga = floatval($state);
@@ -191,8 +202,13 @@ class ProdukResource extends Resource
                     ->label('Kode/SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('satuan.nama')
+                    ->label('Satuan Dasar')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('kategories.nama')
+                    ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('minimal_stok')
                     ->numeric()
@@ -224,18 +240,36 @@ class ProdukResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nama')
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function(Produk $record){
+                            DB::transaction(function () use ($record) {
+                                $record->kategories()->detach();
+                                $record->multiSatuan()->delete();
+                            });
+                        }),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function(Collection $records){
+                            // $records->each->kategories->detach();
+                            $records->each(function($record){
+                                DB::transaction(function () use ($record) {
+                                    $record->kategories()->detach();
+                                    $record->multiSatuan()->delete();
+                                    $record->delete();
+                                });
+                            });
+                        }),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data produk')

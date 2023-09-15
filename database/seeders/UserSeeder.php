@@ -118,27 +118,54 @@ class UserSeeder extends Seeder
 
             //  Kategori
             [
-                'name'  =>  'categori: view-any',
+                'name'  =>  'category: view-any',
                 'alias' =>  'Lihat Daftar Kategori',
                 'group' =>  'Manajemen Kategori',
             ],
             [
-                'name'  =>  'categori: view',
+                'name'  =>  'category: view',
                 'alias' =>  'Lihat Detail Kategori',
                 'group' =>  'Manajemen Kategori',
             ],
             [
-                'name'  =>  'categori: create',
+                'name'  =>  'category: create',
                 'alias' =>  'Buat Data Kategori',
                 'group' =>  'Manajemen Kategori',
             ],
             [
-                'name'  =>  'categori: update',
+                'name'  =>  'category: update',
                 'alias' =>  'Ubah Data Kategori',
                 'group' =>  'Manajemen Kategori',
             ],
             [
-                'name'  =>  'categori: delete',
+                'name'  =>  'category: delete',
+                'alias' =>  'Hapus Data Kategori',
+                'group' =>  'Manajemen Kategori',
+            ],
+
+            //  Lokasi
+            [
+                'name'  =>  'location: view-any',
+                'alias' =>  'Lihat Daftar Kategori',
+                'group' =>  'Manajemen Kategori',
+            ],
+            [
+                'name'  =>  'location: view',
+                'alias' =>  'Lihat Detail Kategori',
+                'group' =>  'Manajemen Kategori',
+            ],
+            [
+                'name'  =>  'location: create',
+                'alias' =>  'Buat Data Kategori',
+                'group' =>  'Manajemen Kategori',
+            ],
+            [
+                'name'  =>  'location: update',
+                'alias' =>  'Ubah Data Kategori',
+                'group' =>  'Manajemen Kategori',
+            ],
+            [
+                'name'  =>  'location: delete',
                 'alias' =>  'Hapus Data Kategori',
                 'group' =>  'Manajemen Kategori',
             ],
@@ -167,6 +194,16 @@ class UserSeeder extends Seeder
             [
                 'name'  =>  'product: delete',
                 'alias' =>  'Hapus Data Produk',
+                'group' =>  'Manajemen Produk',
+            ],
+            [
+                'name'  =>  'product: import',
+                'alias' =>  'Import Data Produk',
+                'group' =>  'Manajemen Produk',
+            ],
+            [
+                'name'  =>  'product: export',
+                'alias' =>  'Export Data Produk',
                 'group' =>  'Manajemen Produk',
             ],
 
@@ -211,37 +248,39 @@ class UserSeeder extends Seeder
 
             if($role == 'pemilik')
             {
-                $createdRole->syncPermissions(Permission::all());
+                $permissions = Permission::where('name', 'like', 'product:%')->get();
+                $permissions = $permissions->merge(Permission::where('name', 'like', 'category:%')->get());
+                $permissions = $permissions->merge(Permission::where('name', 'like', 'unit:%')->get());
+                $permissions = $permissions->merge(Permission::where('name', 'like', 'location:%')->get());
+                $permissions = $permissions->merge(Permission::where('name', 'like', 'user:%')->get());
+                $permissions = $permissions->merge(Permission::where('name', 'like', 'role:%')->get());
+                $createdRole->syncPermissions($permissions);
             }
 
-            // if($role == 'apoteker')
-            // {
-            //     $permissions = Permission::where('name', 'like', 'produk:%')->get();
-            //     $permissions = $permissions->merge(Permission::where('name', 'like', 'kategori-produk:%')->get());
-            //     $permissions = $permissions->merge(Permission::where('name', 'like', 'satuan-produk:%')->get());
+            if($role == 'apoteker')
+            {
+                // $permissions = Permission::where('name', 'product: view-any')->get();
+                // $permissions = $permissions->merge(Permission::where('name', 'category: view-any')->get());
+                // $permissions = $permissions->merge(Permission::where('name', 'unit: view-any')->get());
 
-            //     $createdRole->syncPermissions($permissions);
-            // }
+                // $createdRole->syncPermissions($permissions);
+                $createdRole->syncPermissions([
+                    'product: view-any',
+                    'product: view',
+                    'category: view-any',
+                    'unit: view-any',
+                ]);
+            }
 
-            // if($role == 'admin')
-            // {
-            //     $permissions = Permission::where('name', 'like', 'produk:%')->get();
-            //     $permissions = $permissions->merge(Permission::where('name', 'like', 'kategori-produk:%')->get());
-            //     $permissions = $permissions->merge(Permission::where('name', 'like', 'satuan-produk:%')->get());
-                
-            //     $createdRole->syncPermissions($permissions);
-            // }
-
-            // if($role == 'kasir')
-            // {
-            //     $createdRole->syncPermissions([
-            //         'produk: view-any',
-            //         'produk: view',
-            //         'shift: buka-tutup',
-            //         'penjualan: kasir',
-            //         'penjualan: retur-penjualan'
-            //     ]);
-            // }
+            if($role == 'kasir')
+            {
+                $createdRole->syncPermissions([
+                    'product: view-any',
+                    'product: view',
+                    'category: view-any',
+                    'unit: view-any',
+                ]);
+            }
         }
 
         $progressBar->finish();
@@ -262,13 +301,13 @@ class UserSeeder extends Seeder
                 'name'      => 'Junaidi Fatrizal',
                 'username'  => 'pemilik',
                 'email'     => 'pemilik@example.com',
-                'password'  => 'pemilik1234',
+                'password'  => 'Muhammad->570M',
                 'role'      => [
                     'pemilik'
                 ],
             ],
             [
-                'name'      => 'Apoteker',
+                'name'      => 'Junaidi Fatrizal',
                 'username'  => 'apoteker01',
                 'email'     => 'apoteker01@example.com',
                 'password'  => 'apoteker1234',

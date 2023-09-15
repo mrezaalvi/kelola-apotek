@@ -59,7 +59,8 @@ class KategoriResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama Kategori')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('digunakan')
                     ->label('Digunakan?')
                     ->boolean(),
@@ -82,6 +83,7 @@ class KategoriResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nama')
             ->filters([
                 //
             ])
