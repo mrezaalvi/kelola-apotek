@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Produk;
+use App\Models\MultiSatuan;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -28,7 +30,7 @@ class Satuan extends Model
     }
 
     public function multiSatuan(): HasMany{
-        return $this->hasMany(MultiSatuan::class);
+        return $this->hasMany(MultiSatuan::class, 'satuan_lanjutan');
     }
 
     public function createdBy(): BelongsTo

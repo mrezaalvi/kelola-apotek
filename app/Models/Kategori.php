@@ -26,7 +26,7 @@ class Kategori extends Model
 
     public function produks(): BelongsToMany
     {
-        return $this->belongsTo(Produk::class, 'produk_kategori');
+        return $this->belongsToMany(Produk::class, 'produk_kategori');
     }
 
     public function createdBy(): BelongsTo

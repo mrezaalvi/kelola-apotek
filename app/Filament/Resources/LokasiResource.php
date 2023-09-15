@@ -70,6 +70,10 @@ class LokasiResource extends Resource
                     ->label('Digunakan?')
                     ->boolean(),
             ])
+            ->groups([
+                Tables\Grouping\Group::make('jenis')
+                    ->collapsible(true),
+            ])
             ->filters([
                 //
             ])
@@ -88,7 +92,8 @@ class LokasiResource extends Resource
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Data Lokasi')
                     ->icon('heroicon-m-plus'),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
     
     public static function getPages(): array

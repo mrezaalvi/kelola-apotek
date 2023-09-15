@@ -77,7 +77,12 @@ class PermissionResource extends Resource
             //         ->label('Buat Data Pengguna')
             //         ->icon('heroicon-m-plus'),
             // ])
-            ;
+            ->groups([
+                Tables\Grouping\Group::make('group')
+                ->collapsible(true),
+            ])
+            ->defaultGroup('group')
+            ->paginated([10, 25, 50]);
     }
     
     public static function getRelations(): array

@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SatuanResource\Pages;
-use App\Filament\Resources\SatuanResource\RelationManagers;
-use App\Models\Satuan;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Satuan;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\SatuanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SatuanResource\RelationManagers;
 
 class SatuanResource extends Resource
 {
@@ -61,7 +63,18 @@ class SatuanResource extends Resource
                 
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama Satuan')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('produks_count')
+                    ->label('Digunakan sebagai Satuan Dasar')
+                    ->counts('produks')
+                    ->alignment(Alignment::Center)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('multi_satuan_count')
+                    ->label('Digunakan sebagai Multi Satuan')
+                    ->counts('multiSatuan')
+                    ->alignment(Alignment::Center)
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('digunakan')
                     ->label('Digunakan?')
                     ->boolean(),
@@ -84,16 +97,54 @@ class SatuanResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nama')
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),        
+                Tables\Actions\DeleteAction::make()
+                    ->before(function($record, Tables\Actions\DeleteAction $action){
+                        if(($record->produks()->count()>0) || ($record->multiSatuan()->count()>0))
+                        {
+                            Notification::make()
+                                ->warning()
+                                ->title('Data '.$record->nama.' telah digunakan pada data yang lain!')
+                                ->body('Silahkan ubah atau hapus data yang terhubung dengan data ini')
+                                ->send();
+                            $action->cancel();
+                        }
+                    }),        
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function($records){
+                            $recordDeleted = 0;
+                            $itemCantDelete = "";
+                            foreach($records as $record)
+                            {
+                                // dd($record->multiSatuan()->count());
+                                if(($record->produks()->count()<1) && ($record->multiSatuan()->count()<1))
+                                {
+                                    if($record->delete())
+                                        $recordDeleted++;
+                                }
+                            }
+                            if($recordDeleted<$records->count())
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Beberapa data mungkin tidak dapat dihapus')
+                                    ->body('Data berhasil dihapus : '.$recordDeleted
+                                    .'<br>Data gagal dihapus : '.$records->count() - $recordDeleted)
+                                    ->send();
+                            else
+                                Notification::make()
+                                    ->success()
+                                    ->title('Semua data berhasil dihapus')
+                                    ->body('Seluruh data yang dipilih berhasil dihapus')
+                                    ->send();
+                        }),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data satuan')
@@ -103,7 +154,8 @@ class SatuanResource extends Resource
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Data Satuan')
                     ->icon('heroicon-m-plus'),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
     
     public static function getPages(): array

@@ -27,6 +27,20 @@ class Produk extends Model
         );
     }
 
+    public function kode(): Attribute
+    {
+        return new Attribute(
+            set: fn($value) => ($value)?Str::of($value)->trim():$value,
+        );
+    }
+
+    public function barcode(): Attribute
+    {
+        return new Attribute(
+            set: fn($value) => ($value)?Str::of($value)->trim():$value,
+        );
+    }
+
     public function hargaBeli(): Attribute
     {
         return new Attribute(

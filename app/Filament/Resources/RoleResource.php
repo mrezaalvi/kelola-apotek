@@ -96,7 +96,8 @@ class RoleResource extends Resource
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Grup Pengguna')
                     ->icon('heroicon-m-plus'),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
     
     public static function getRelations(): array

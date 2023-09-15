@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\KategoriResource\Pages;
-use App\Filament\Resources\KategoriResource\RelationManagers;
-use App\Models\Kategori;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Kategori;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\KategoriResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\KategoriResource\RelationManagers;
 
 class KategoriResource extends Resource
 {
@@ -61,6 +63,11 @@ class KategoriResource extends Resource
                     ->label('Nama Kategori')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('produks_count')
+                    ->label('Digunakan pada @ Produk')
+                    ->counts('produks')
+                    ->alignment(Alignment::Center)
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('digunakan')
                     ->label('Digunakan?')
                     ->boolean(),
@@ -89,11 +96,47 @@ class KategoriResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function($record, Tables\Actions\DeleteAction $action){
+                        if($record->produks()->count()>0)
+                        {
+                            Notification::make()
+                                ->warning()
+                                ->title('Data '.$record->nama.' telah digunakan pada data yang lain!')
+                                ->body('Silahkan ubah atau hapus data yang terhubung dengan data ini')
+                                ->send();
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function($records){
+                            $recordDeleted = 0;
+                            $itemCantDelete = "";
+                            foreach($records as $record)
+                            {
+                                if($record->produks()->count()<1)
+                                {
+                                    if($record->delete())
+                                        $recordDeleted++;
+                                }
+                            }
+                            if($recordDeleted<$records->count())
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Beberapa data mungkin tidak dapat dihapus')
+                                    ->body('Data berhasil dihapus : '.$recordDeleted
+                                    .'<br>Data gagal dihapus : '.$records->count() - $recordDeleted)
+                                    ->send();
+                            else
+                                Notification::make()
+                                    ->success()
+                                    ->title('Semua data berhasil dihapus')
+                                    ->body('Seluruh data yang dipilih berhasil dihapus')
+                                    ->send();
+                        }),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data kategori')
@@ -103,7 +146,8 @@ class KategoriResource extends Resource
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Data Kategori')
                     ->icon('heroicon-m-plus'),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
     
     public static function getPages(): array

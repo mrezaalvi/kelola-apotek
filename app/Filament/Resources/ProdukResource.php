@@ -9,6 +9,7 @@ use App\Models\Satuan;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
+use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\ProdukResource\Pages;
@@ -161,21 +162,21 @@ class ProdukResource extends Resource
                                     ->live(onBlur: true)
                                     ->extraInputAttributes(['class' => 'text-end']),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\TextInput::make('harga_beli')
-                                    ->numeric()
-                                    
+                                    ->label('Harga Beli')
+                                    ->numeric()                                    
                                     ->placeholder('0,00')
                                     ->extraInputAttributes(['class' => 'text-end']),
-                                
-                                
+
                                 Forms\Components\TextInput::make('harga_jual')
+                                    ->label('Harga Jual')
                                     ->numeric()
                                     ->placeholder('0,00')
                                     ->live(onBlur: true)
                                     ->disabled(fn(Forms\Get $get)=>$get('use_margin'))
-                                    ->afterStateUpdated(function (Forms\Set $set, Get $get, ?string $state) {
+                                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
                                         if($get('harga_beli') && !$get('use_margin')){
                                             $hargaBeli = $get('harga_beli');
                                             $hargaJual = $state;
@@ -183,6 +184,12 @@ class ProdukResource extends Resource
                                             return $set('margin_harga', $marginHarga);
                                         }
                                     })
+                                    ->extraInputAttributes(['class' => 'text-end']),
+
+                                Forms\Components\TextInput::make('diskon')
+                                    ->label('Diskon/Potongan')
+                                    ->numeric()                                    
+                                    ->placeholder('0,00')
                                     ->extraInputAttributes(['class' => 'text-end']),
                             ]),
                         
@@ -200,7 +207,8 @@ class ProdukResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('kode')
                     ->label('Kode/SKU')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable()
                     ->sortable(),
@@ -209,16 +217,25 @@ class ProdukResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('kategories.nama')
                     ->label('Kategori')
+                    ->searchable()
+                    ->default('-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('minimal_stok')
                     ->numeric()
+                    ->alignment(Alignment::Center)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_beli')
                     ->numeric()
+                    ->alignment(Alignment::Center)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->numeric()
+                    ->alignment(Alignment::Center)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('kemasan')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('pabrik')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('digunakan')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('createdBy.name')
@@ -241,8 +258,19 @@ class ProdukResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('nama')
+            ->groups([
+                'satuan.nama',
+                'pabrik',
+            ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('kategories')
+                    ->relationship('kategories', 'nama')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('satuan')
+                    ->relationship('satuan', 'nama')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -261,7 +289,6 @@ class ProdukResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(function(Collection $records){
-                            // $records->each->kategories->detach();
                             $records->each(function($record){
                                 DB::transaction(function () use ($record) {
                                     $record->kategories()->detach();
@@ -279,7 +306,9 @@ class ProdukResource extends Resource
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Data Produk')
                     ->icon('heroicon-m-plus'),
-            ]);
+            ])
+            ->striped()
+            ->paginated([10, 25, 50]);
     }
     
     public static function getRelations(): array
