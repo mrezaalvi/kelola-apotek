@@ -4,9 +4,12 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Infolists;
+use Filament\Support;
 use App\Models\Produk;
 use App\Models\Satuan;
 use Filament\Support\RawJs;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
 use Filament\Support\Enums\Alignment;
@@ -311,6 +314,60 @@ class ProdukResource extends Resource
             ->paginated([10, 25, 50]);
     }
     
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Informasi Produk')
+                    ->icon('heroicon-m-information-circle')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('nama')
+                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                            ->weight(Support\Enums\FontWeight::Bold)
+                            ->columnSpan(2),
+                        Infolists\Components\TextEntry::make('kode')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500),
+                        Infolists\Components\TextEntry::make('barcode')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500),
+                        Infolists\Components\TextEntry::make('deskripsi')
+                            ->columnSpan(4),
+                        Infolists\Components\Grid::make()
+                            ->schema([
+                                Infolists\Components\TextEntry::make('pabrik'),
+                                Infolists\Components\TextEntry::make('kemasan'),
+                                Infolists\Components\TextEntry::make('minimal_stok'),
+                            ])
+                            ->columns(4)
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('kategories.nama')
+                            ->formatStateUsing(fn (string $state): string => ($state)?$state:"-"),
+                        Infolists\Components\TextEntry::make('satuan.nama')
+                            ->formatStateUsing(fn (string $state): string => ($state)?$state:"-"),
+                        Infolists\Components\RepeatableEntry::make('multiSatuan')
+                            ->schema([
+                                Infolists\Components\TextEntry::make('satuan.nama'),
+                                Infolists\Components\TextEntry::make('nilai_konversi')
+                                    ->label('@ Satuan Dasar'),
+                            ])
+                            ->columns(2)
+                            ->columnSpan(2),
+                    ])->columns(4),
+                InfoLists\Components\Section::make('Harga')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('harga_beli')
+                            ->label('Harga Beli'),
+                        Infolists\Components\TextEntry::make('harga_beli')
+                            ->label('Harga Jual'),
+                        Infolists\Components\TextEntry::make('diskon')
+                            ->label('Diskon'),
+                    ])->columns(4),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [

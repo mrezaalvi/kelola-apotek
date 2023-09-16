@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Pages\Auth;
 
 use Filament\Forms\Form;
 use Filament\Actions\Action;
@@ -9,7 +9,7 @@ use Filament\Pages\SimplePage;
 use Filament\Actions\ActionGroup;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Blade;
-use App\View\Components\PasswordInput;
+use App\Forms\Components\PasswordInput;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
@@ -18,8 +18,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Pages\Auth\Login as BaseLogin;
 use Illuminate\Validation\ValidationException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
-use Filament\Pages\Concerns\InteractsWithFormActions;
 
+use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 
@@ -29,7 +29,7 @@ class Login extends BaseLogin
     /**
      * @var view-string
      */
-    protected static string $view = 'filament.pages.login';
+    protected static string $view = 'filament.pages.auth.login';
 
     public function authenticate(): ?LoginResponse
     {

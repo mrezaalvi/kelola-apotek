@@ -15,12 +15,11 @@ class ViewProduk extends ViewRecord
         return [
             Actions\Action::make('back')
                 ->label('Kembali')
-                ->outlined()
-                ->color('danger')
+                ->color('warning')
                 ->icon('heroicon-m-arrow-uturn-left')
                 ->url(fn()=>ProdukResource::getUrl()),
             Actions\EditAction::make()
-                ->label('Ubah Data Produk')
+                ->label('Ubah')
                 ->icon('heroicon-m-pencil'),
         ];
     }

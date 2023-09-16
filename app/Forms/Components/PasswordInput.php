@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components;
+namespace App\Forms\Components;
 
 use Closure;
 use Illuminate\Support\Str;
@@ -14,9 +14,9 @@ class PasswordInput extends TextInput
 {
     use CanCopy;
     use CanGenerate;
-    
-    protected string $view = 'components.password-input';
-    
+
+    protected string $view = 'forms.components.password-input';
+
     protected string $showIcon = 'heroicon-o-eye';
 
     protected string $hideIcon = 'heroicon-o-eye-off';
