@@ -17,7 +17,7 @@ class Lokasi extends Model
     public function nama(): Attribute
     {
         return new Attribute(
-            set: fn(string $value) => strtoupper($value),
+            set: fn(string $value) => trim(strtoupper($value)),
         );
     }
 

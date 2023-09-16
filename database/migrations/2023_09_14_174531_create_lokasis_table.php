@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lokasis', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 50)->unique();
-            $table->enum('jenis', ['gudang', 'rak']);
+            $table->enum('jenis', ['gudang', 'rak'])->default('rak');
             $table->boolean('digunakan')->default(true);
             $table->foreignId('created_by')
                 ->nullable()

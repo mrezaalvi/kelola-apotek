@@ -2,9 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\Produk;
-use App\Models\Satuan;
-use App\Models\Kategori;
+use App\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
@@ -25,7 +23,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
         foreach ($rows as $row) {
             if(!empty($row['nama']))
             {
-                $produk = Produk::where('nama', trim($row['nama']))->first();
+                $produk = Models\Produk::where('nama', trim($row['nama']))->first();
                 $listSatuan = $this->getSatuan($row['satuan']);
                 
                 $satuanDasarId = (count($listSatuan['satuan_dasar'])>0)?$listSatuan['satuan_dasar']['id']:null;
@@ -51,7 +49,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
                 if(!$produk)
                 {
-                    $produk = Produk::firstOrCreate([
+                    $produk = Models\Produk::firstOrCreate([
                         'nama' => $row['nama'],
                         'kode' => $row['kodesku'],
                         'barcode' => $row['barcode'],
@@ -134,10 +132,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
         $satuanDasar = trim(array_slice($satuanArr, -1, 1)[0]);
         
-        $satuanDasarRecord = Satuan::where('nama', $satuanDasar)->first();
+        $satuanDasarRecord = Models\Satuan::where('nama', $satuanDasar)->first();
 
         if(!$satuanDasarRecord)
-            $satuanDasarRecord = Satuan::create(['nama' => $satuanDasar]);
+            $satuanDasarRecord = Models\Satuan::create(['nama' => $satuanDasar]);
         
         $satuan['satuan_dasar'] = [
             'id' => $satuanDasarRecord->id,
@@ -154,9 +152,9 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                     $item = explode('@',$item);
                     if(count($item)==2)
                     {
-                        $satuanLanjutanRecord = Satuan::where('nama', $item[0])->first();
+                        $satuanLanjutanRecord = Models\Satuan::where('nama', $item[0])->first();
                         if(!$satuanLanjutanRecord)
-                            $satuanLanjutanRecord = Satuan::create(['nama'=>$item[0]]);
+                            $satuanLanjutanRecord = Models\Satuan::create(['nama'=>$item[0]]);
 
                         array_push($multiSatuan, [
                             'id' => $satuanLanjutanRecord->id,
@@ -183,20 +181,28 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
         foreach($kategoriNamaArr as $kategoriNama)
         {
             
-            $kategori = Kategori::where('nama', Str::of($kategoriNama)->trim()->upper())->first();
+            $kategori = Models\Kategori::where('nama', Str::of($kategoriNama)->trim()->upper())->first();
             
             if(!$kategori)
-                $kategori = Kategori::create(['nama' => $kategoriNama]);
+                $kategori = Models\Kategori::create(['nama' => $kategoriNama]);
 
             array_push($kategoriId, $kategori->id);
         }
         return $kategoriId;
     }
 
-    public function getLokasiId(?string $lokasiNama):int{
-        $lokasi = Lokasi::where('nama', trim($lokasiNama))->first();
+    public function getLokasiId(?string $lokasiNama):int|null{
+        if(!$lokasiNama)
+            return null;
+
+        if(empty(trim($lokasiNama)))
+            return null;
+        
+        $lokasi = Models\Lokasi::where('nama', trim($lokasiNama))->first();
         if(!$lokasi)
-            $lokasi = Lokasi::create(['nama'=>trim($lokasiNama)]);
+        {
+            $lokasi = Models\Lokasi::create(['nama'=>trim($lokasiNama)]);
+        }
         
         return ($lokasi)?->id;
     }
