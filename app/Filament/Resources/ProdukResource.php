@@ -4,16 +4,18 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Infolists;
 use Filament\Support;
 use App\Models\Produk;
 use App\Models\Satuan;
+use Filament\Infolists;
 use Filament\Support\RawJs;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\ProdukResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -63,23 +65,23 @@ class ProdukResource extends Resource
 
                         Forms\Components\Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('satuan')
-                                    ->label('Satuan Dasar')
-                                    ->relationship('satuan', 'nama')
-                                    ->searchable()
-                                    ->preload()
-                                    ->live(onBlur: true)
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('nama')
-                                            ->unique(ignoreRecord: true)
-                                            ->required(),
-                                    ]),
                                 Forms\Components\Select::make('kategories')
                                     ->label('Kategori')
                                     ->multiple()
                                     ->relationship('kategories', 'nama')
                                     ->searchable()
                                     ->preload()
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('nama')
+                                            ->unique(ignoreRecord: true)
+                                            ->required(),
+                                    ]),
+                                Forms\Components\Select::make('satuan')
+                                    ->label('Satuan Dasar')
+                                    ->relationship('satuan', 'nama')
+                                    ->searchable()
+                                    ->preload()
+                                    ->live(onBlur: true)
                                     ->createOptionForm([
                                         Forms\Components\TextInput::make('nama')
                                             ->unique(ignoreRecord: true)
@@ -116,7 +118,7 @@ class ProdukResource extends Resource
                                     ]),  
                             ])
                             ->defaultItems(0)
-                            ->disabled(fn(Forms\Get $get)=>!$get('satuan'))
+                            ->hidden(fn(Forms\Get $get)=>!$get('satuan'))
                             ->reorderable(false)
                             ->reorderableWithButtons(),
 
@@ -142,57 +144,116 @@ class ProdukResource extends Resource
                             ->extraInputAttributes(['class' => 'text-end']),
                         Forms\Components\Grid::make()
                             ->schema([
+                                Forms\Components\TextInput::make('margin_harga')
+                                    ->label('Margin')
+                                    ->numeric()
+                                    ->placeholder('0,00')
+                                    ->suffix('%')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
+                                        $hargaBeli = floatval($get('harga_beli')) ;
+                                        $marginHarga = floatval($state);
+                                        $gunakanMargin = $get('use_margin'); 
+                                        if(
+                                            $gunakanMargin
+                                        ){
+                                            if(($hargaBeli == 0)){
+                                                return $set('harga_jual', 0);    
+                                            }
+
+                                            if(($marginHarga == 0)){
+                                                return $set('harga_jual', $hargaBeli);    
+                                            }
+                                            $hargaJual = ($hargaBeli + (($hargaBeli * $marginHarga)/100));
+                                            return $set('harga_jual', $hargaJual);
+                                        }
+                                    })                                    
+                                    ->extraAttributes(['class' => 'max-w-xs'])
+                                    ->extraInputAttributes(['class' => 'text-end']),
                                 Forms\Components\Checkbox::make('use_margin')
                                     ->label('Gunakan Margin')
                                     ->dehydrated(false)
                                     ->live()
-                                    ->extraAttributes(['class' => 'items-end']),
-                                Forms\Components\TextInput::make('margin_harga')
-                                    ->label('Margin')
-                                    ->numeric()
-                                    ->required(fn(Forms\Get $get)=>$get('use_margin'))
-                                    ->disabled(fn(Forms\Get $get)=>!$get('use_margin'))
-                                    ->placeholder('0,00')
-                                    ->suffix('%')
                                     ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
-                                        if($get('harga_beli')){
-                                            $hargaBeli = floatval($get('harga_beli'));
-                                            $marginHarga = floatval($state);
+                                        $hargaBeli = floatval($get('harga_beli')) ;
+                                        $marginHarga = floatval($get('margin_harga'));
+                                        $gunakanMargin = $state; 
+                                        if(
+                                            $gunakanMargin
+                                        ){
+                                            if(($hargaBeli == 0)){
+                                                return $set('harga_jual', 0);    
+                                            }
+
+                                            if(($marginHarga == 0)){
+                                                return $set('harga_jual', $hargaBeli);    
+                                            }
                                             $hargaJual = ($hargaBeli + (($hargaBeli * $marginHarga)/100));
                                             return $set('harga_jual', $hargaJual);
                                         }
                                     })
-                                    ->live(onBlur: true)
-                                    ->extraInputAttributes(['class' => 'text-end']),
-                            ]),
+                                    ->extraAttributes(['class' => 'max-w-xs'])
+                                    ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk menggunakan margin.</span>'))
+                                    ->extraInputAttributes(['class' => 'items-end']),
+                            ])->columns(1),
                         Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\TextInput::make('harga_beli')
                                     ->label('Harga Beli')
-                                    ->numeric()                                    
+                                    ->numeric()            
                                     ->placeholder('0,00')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
+                                        $hargaBeli = ($state)?floatval($state):0;
+                                        $marginHarga = floatval($get('margin_harga'));
+                                        $gunakanMargin = $get('use_margin'); 
+                                        if(
+                                            $gunakanMargin
+                                        ){
+                                            if(($hargaBeli == 0)){
+                                                return $set('harga_jual', 0);    
+                                            }
+
+                                            if(($marginHarga == 0)){
+                                                return $set('harga_jual', $hargaBeli);    
+                                            }
+                                            $hargaJual = ($hargaBeli + ($hargaBeli * ($marginHarga/100)));
+                                            return $set('harga_jual', $hargaJual);
+                                        }
+                                    })
                                     ->extraInputAttributes(['class' => 'text-end']),
 
                                 Forms\Components\TextInput::make('harga_jual')
                                     ->label('Harga Jual')
                                     ->numeric()
                                     ->placeholder('0,00')
-                                    ->live(onBlur: true)
-                                    ->disabled(fn(Forms\Get $get)=>$get('use_margin'))
-                                    ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
-                                        if($get('harga_beli') && !$get('use_margin')){
-                                            $hargaBeli = $get('harga_beli');
-                                            $hargaJual = $state;
-                                            $marginHarga = number_format(((floatval($hargaJual) - floatval($hargaBeli))/floatval($hargaJual))*100,2);
-                                            return $set('margin_harga', $marginHarga);
-                                        }
+                                    ->live()
+                                    // ->disabled(fn(Forms\Get $get)=>$get('use_margin'))
+                                    ->hint(function(Forms\Get $get){
+                                        $gunakanMargin = $get('use_margin');
+                                        $hargaBeli = floatval($get('harga_beli'));
+                                        $hargaJual = floatval($get('harga_jual'));
+                                        $marginHarga = 0;
+                                        if($gunakanMargin)
+                                            return "Margin : ".$get('margin_harga')."%";
+                                        if($hargaBeli && $hargaJual)
+                                            $marginHarga = number_format((($hargaJual - $hargaBeli)/$hargaBeli)*100,2);
+                                        return "Margin : ".$marginHarga."%";
                                     })
-                                    ->extraInputAttributes(['class' => 'text-end']),
+                                    ->hintColor('primary')          
+                                    ->extraInputAttributes(function(Forms\Get $get){
+                                        $attribute = ['class' => 'text-end'];
+                                        $readOnlyAttribute = ['class'=>'text-end bg-gray-200','readonly' => 'true'];
+                                        if($get('use_margin'))
+                                            $attribute = $readOnlyAttribute;
+                                        return $attribute;
+                                    }),
 
                                 Forms\Components\TextInput::make('diskon')
                                     ->label('Diskon/Potongan')
                                     ->numeric()                                    
                                     ->placeholder('0,00')
+                                    ->suffix('%')
                                     ->extraInputAttributes(['class' => 'text-end']),
                             ]),
                         
@@ -221,18 +282,19 @@ class ProdukResource extends Resource
                 Tables\Columns\TextColumn::make('kategories.nama')
                     ->label('Kategori')
                     ->searchable()
-                    ->default('-')
-                    ->sortable(),
+                    ->badge()
+                    ->separator(',')
+                    ->default('-'),
                 Tables\Columns\TextColumn::make('minimal_stok')
                     ->numeric()
                     ->alignment(Alignment::Center)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_beli')
-                    ->numeric()
+                    ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
-                    ->numeric()
+                    ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('kemasan')
@@ -287,7 +349,7 @@ class ProdukResource extends Resource
                             });
                         }),
                 ]),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
@@ -296,6 +358,7 @@ class ProdukResource extends Resource
                                 DB::transaction(function () use ($record) {
                                     $record->kategories()->detach();
                                     $record->multiSatuan()->delete();
+                                    $record->persediaan()->delete();
                                     $record->delete();
                                 });
                             });
@@ -354,16 +417,27 @@ class ProdukResource extends Resource
                                     ->label('@ Satuan Dasar'),
                             ])
                             ->columns(2)
+                            // ->hidden(fn($record)=>multiSatuan.count())
                             ->columnSpan(2),
                     ])->columns(4),
+
                 InfoLists\Components\Section::make('Harga')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_beli')
-                            ->label('Harga Beli'),
-                        Infolists\Components\TextEntry::make('harga_beli')
-                            ->label('Harga Jual'),
+                            ->label('Harga Beli')
+                            ->money('idr')
+                            ->color('primary'),
+                        Infolists\Components\TextEntry::make('harga_jual')
+                            ->label('Harga Jual')
+                            ->money('idr')
+                            ->color('primary'),
                         Infolists\Components\TextEntry::make('diskon')
-                            ->label('Diskon'),
+                            ->label('Diskon')
+                            ->color('primary')
+                            ->formatStateUsing(function(string $state): string {
+                                $diskon = str_replace(".",",",$state);
+                                return __("{$diskon}%");
+                            }),
                     ])->columns(4),
             ]);
     }

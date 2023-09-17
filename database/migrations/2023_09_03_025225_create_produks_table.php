@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedDecimal('diskon', 5, 2)->default(0);
             $table->unsignedDecimal('harga_beli', 12, 2)->default(0);
             $table->unsignedDecimal('harga_jual', 12, 2)->default(0);
-            $table->unsignedDecimal('margin_harga', 5, 2)->default(100);
+            $table->unsignedDecimal('margin_harga', 5, 2)->default(20);
             $table->boolean('digunakan')->default(true);
             $table->foreignId('created_by')
                 ->nullable()

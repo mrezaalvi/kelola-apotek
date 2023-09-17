@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('multi_satuans', function (Blueprint $table) {
-            $table->decimal('harga_beli', 12, 2)->default(0);
-            $table->decimal('harga_jual', 12, 2)->default(0);
-            $table->decimal('diskon', 12, 2)->default(0);
+        Schema::table('persediaans', function (Blueprint $table) {
+             $table->string('ref')->after('satuan_id');
         });
     }
 
@@ -23,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::table('multi_satuans', function (Blueprint $table) {
+        // Schema::table('persediaans', function (Blueprint $table) {
         //     //
         // });
     }

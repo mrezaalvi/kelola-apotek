@@ -18,7 +18,7 @@ class Produk extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['kode', 'barcode', 'nama', 'satuan_id', 'deskripsi', 'pabrik', 'kemasan', 'minimal_stok', 'harga_beli', 'harga_jual', 'margin_harga', 'digunakan', 'created_by', 'last_edited_by'];
+    protected $fillable = ['kode', 'barcode', 'nama', 'satuan_id', 'deskripsi', 'pabrik', 'kemasan', 'minimal_stok', 'harga_beli', 'harga_jual', 'diskon', 'margin_harga', 'digunakan', 'created_by', 'last_edited_by'];
 
     public function nama(): Attribute
     {
@@ -44,21 +44,22 @@ class Produk extends Model
     public function hargaBeli(): Attribute
     {
         return new Attribute(
-            set: fn($value) => number_format(floatval($value), 2, '.', ''),
+            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
         );
     }
 
     public function hargaJual(): Attribute
     {
         return new Attribute(
-            set: fn($value) => number_format(floatval($value), 2, '.', ''),
+            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
         );
     }
 
     public function marginHarga(): Attribute
     {
         return new Attribute(
-            set: fn($value) => number_format(floatval($value), 2, '.', ''),
+            get: fn($value) => floatval($value),
+            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
         );
     }
 
@@ -84,6 +85,10 @@ class Produk extends Model
         return $this->belongsToMany(Kategori::class, 'produk_kategori');
     }
 
+    public function persediaan(): HasMany
+    {
+        return $this->hasMany(Persediaan::class);
+    }
     
     public function createdBy(): BelongsTo
     {

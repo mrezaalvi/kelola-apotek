@@ -3,6 +3,8 @@
 namespace App\Imports;
 
 use App\Models;
+use Carbon\Carbon;
+use App\Models\Lokasi;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
@@ -57,8 +59,8 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         'pabrik' => $row['pabrik'],
                         'kemasan' => $kemasan,
                         'diskon' => $row['diskon'],
-                        'harga_beli' => $row['harga_beli'],
-                        'harga_jual' => $row['harga_jual'],
+                        'harga_beli' => str_replace(",",".",$row['harga_beli']),
+                        'harga_jual' => str_replace(",",".",$row['harga_jual']),
                         'satuan_id' => $satuanDasarId,
                     ]);
                 }
@@ -77,10 +79,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         $produk->pabrik = $row['pabrik'];
                     
                     if(($produk->harga_beli == 0) && $row['harga_beli'])
-                        $produk->harga_beli = $row['harga_beli'];
+                        $produk->harga_beli = str_replace(",",".",$row['harga_jual']);
 
                     if(($produk->harga_jual == 0) && $row['harga_jual'])
-                        $produk->harga_jual = $row['harga_jual'];
+                        $produk->harga_jual = str_replace(",",".",$row['harga_jual']);
 
                     if(!$produk->satuan_id && $satuanDasarId)
                         $produk->satuan_id = $satuanDasarId;
@@ -100,13 +102,31 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                     {
                         $multiple *= $satuan['nilai_konversi'];
                         $produk->multiSatuan()->updateOrCreate(
-                            ['satuan_lanjutan' => $satuan['id'],],
-                            ['nilai_konversi' => $multiple,]
+                            ['satuan_lanjutan' => $satuan['id'],'nilai_konversi' => $multiple,],
+                            ['harga_beli' => $row['harga_beli'],'harga_jual' => $row['harga_jual'],]
                         );
                     }
                 }
 
-                $lokasiId = $this->getLokasiId($row['lokasi']);
+                $lokasiId = Lokasi::find(1)->id;
+                if(!empty(trim($row['lokasi'])))
+                    $lokasiId = $this->getLokasiId($row['lokasi']);
+                
+                $produk->persediaan()->firstOrCreate(
+                    [
+                        'satuan_id' => $satuanDasarId,
+                        'lokasi_id' => $lokasiId,
+                        'ref' => "",
+                        'no_batch' => $row['nobatch'], 
+                        'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
+                        
+                    ],
+                    [
+                        'harga_beli' => str_replace(",",".",$row['harga_beli']),
+                        'stok' => $row['stok'],
+                    ]
+                );
+
             }
         }
         Notification::make()
@@ -209,6 +229,6 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
     public function startRow(): int
     {
-        return 16;
+        return 5;
     }
 }

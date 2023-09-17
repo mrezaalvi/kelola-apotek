@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::table('produks', function (Blueprint $table) {
+            $table->unsignedDecimal('diskon2', 5, 2)->default(0)->after('diskon');
+        });
         Schema::table('multi_satuans', function (Blueprint $table) {
-            $table->decimal('harga_beli', 12, 2)->default(0);
-            $table->decimal('harga_jual', 12, 2)->default(0);
-            $table->decimal('diskon', 12, 2)->default(0);
+            $table->unsignedDecimal('diskon2', 5, 2)->default(0)->after('diskon');
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::table('multi_satuans', function (Blueprint $table) {
+        // Schema::table('table_produk_and_table_multi_satuan', function (Blueprint $table) {
         //     //
         // });
     }

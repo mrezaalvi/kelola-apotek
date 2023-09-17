@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\LokasiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -62,6 +63,8 @@ class LokasiResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama Lokasi')
+                    ->icon(fn($record)=>($record->nama == 'GUDANG UTAMA')?'heroicon-m-lock-closed':'')
+                    ->iconPosition(IconPosition::After)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis')

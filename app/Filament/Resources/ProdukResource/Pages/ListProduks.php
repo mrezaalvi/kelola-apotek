@@ -6,6 +6,8 @@ use Filament\Forms;
 use Filament\Actions;
 use App\Imports\ProdukImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Filament\Support\Enums\Alignment;
+use App\Forms\Components\FileDownload;
 use Illuminate\Support\Facades\Storage;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\ProdukResource;
@@ -23,6 +25,10 @@ class ListProduks extends ListRecords
                 ->icon('heroicon-s-arrow-up-tray')
                 ->modalButton('Import Data Produk')
                 ->form([
+                    FileDownload::make('import-produk-file')
+                        ->label('File Import Template')
+                        ->url(Storage::disk('files-import')->url('templates\produk-import-template.csv'))
+                        ->dehydrated(false),
                     Forms\Components\FileUpload::make('produk-import-file')
                         ->label('File Import')
                         ->disk('files-import')

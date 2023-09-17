@@ -45,7 +45,7 @@ class LokasiPolicy
     public function update(User $user, Lokasi $lokasi): bool
     {
         if(Permission::where('name', 'location: update')->count()>0)
-            return $user->hasPermissionTo('location: update');
+            return $user->hasPermissionTo('location: update') && !($lokasi->nama == 'GUDANG UTAMA');
         return false;
     }
 
@@ -55,7 +55,7 @@ class LokasiPolicy
     public function delete(User $user, Lokasi $lokasi): bool
     {
         if(Permission::where('name', 'location: delete')->count()>0)
-            return $user->hasPermissionTo('location: delete');
+            return $user->hasPermissionTo('location: delete') && !($lokasi->nama == 'GUDANG UTAMA');
         return false;
     }
 
