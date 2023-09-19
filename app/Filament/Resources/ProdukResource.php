@@ -196,7 +196,7 @@ class ProdukResource extends Resource
                                     ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk menggunakan margin.</span>'))
                                     ->extraInputAttributes(['class' => 'items-end']),
                             ])->columns(1),
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('harga_beli')
                                     ->label('Harga Beli')
@@ -248,15 +248,46 @@ class ProdukResource extends Resource
                                             $attribute = $readOnlyAttribute;
                                         return $attribute;
                                     }),
-
-                                Forms\Components\TextInput::make('diskon')
-                                    ->label('Diskon/Potongan')
-                                    ->numeric()                                    
-                                    ->placeholder('0,00')
-                                    ->suffix('%')
-                                    ->extraInputAttributes(['class' => 'text-end']),
                             ]),
-                        
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('diskon')
+                                            ->label('Diskon/Potongan Pertama')
+                                            ->numeric()                                    
+                                            ->placeholder('0,00')
+                                            ->suffix('%')
+                                            ->live()
+                                            ->hint(function(Forms\Get $get, ?string $state){
+                                                $hargaJual = floatval($get('harga_jual'));
+                                                $diskon = floatval($state);
+                                                $label = "Harga jual setelah diskon";
+                                                if(floatval($hargaJual)!=0)
+                                                    return $hargaJual - ($hargaJual * ($diskon/100));
+                                                
+                                                return 0;
+                                            })
+                                            ->extraInputAttributes(['class' => 'text-end']),
+                                    Forms\Components\TextInput::make('diskon2')
+                                        ->label('Diskon/Potongan Kedua (Optional)')
+                                        ->numeric()                                    
+                                        ->placeholder('0,00')
+                                        ->suffix('%')
+                                        ->live()
+                                        ->hint(function(Forms\Get $get, ?string $state){
+                                            $hargaJual = floatval($get('harga_jual'));
+                                            $diskon = floatval($get('diskon'));
+                                            $diskon2 = floatval($state);
+                                            $label = "Harga jual setelah diskon";
+                                            if($hargaJual !=0 && $diskon !=0){
+                                                $hargaDiskon = $hargaJual - ($hargaJual * ($diskon/100)); 
+                                                return $hargaDiskon - ($hargaDiskon * ($diskon2/100));
+                                            }
+                                                
+                                            
+                                            return 0;
+                                        })
+                                        ->extraInputAttributes(['class' => 'text-end']),
+                                ]),
                         Forms\Components\Toggle::make('digunakan')
                             ->label('Digunakan?')
                             ->default(true),
@@ -423,21 +454,44 @@ class ProdukResource extends Resource
 
                 InfoLists\Components\Section::make('Harga')
                     ->schema([
-                        Infolists\Components\TextEntry::make('harga_beli')
-                            ->label('Harga Beli')
-                            ->money('idr')
-                            ->color('primary'),
-                        Infolists\Components\TextEntry::make('harga_jual')
-                            ->label('Harga Jual')
-                            ->money('idr')
-                            ->color('primary'),
-                        Infolists\Components\TextEntry::make('diskon')
-                            ->label('Diskon')
-                            ->color('primary')
-                            ->formatStateUsing(function(string $state): string {
-                                $diskon = str_replace(".",",",$state);
-                                return __("{$diskon}%");
-                            }),
+                        InfoLists\Components\Grid::make()
+                            ->columns([
+                                'sm' => 1,
+                                'lg' => 2,
+                                'xl' => 4,
+                            ])
+                            ->schema([
+                                 InfoLists\Components\TextEntry::make('harga_beli')
+                                    ->label('Harga Beli')
+                                    ->money('idr')
+                                    ->color('primary'),
+                                InfoLists\Components\TextEntry::make('harga_jual')
+                                    ->label('Harga Jual')
+                                    ->money('idr')
+                                    ->color('primary'),
+                            ]),
+                        InfoLists\Components\Grid::make()
+                            ->columns([
+                                'sm' => 1,
+                                'lg' => 2,
+                                'xl' => 4,
+                            ])
+                            ->schema([
+                                Infolists\Components\TextEntry::make('diskon')
+                                    ->label('Diskon/Potongan Pertama')
+                                    ->color('primary')
+                                    ->formatStateUsing(function(string $state): string {
+                                        $diskon = str_replace(".",",",$state);
+                                        return __("{$diskon}%");
+                                    }),
+                                Infolists\Components\TextEntry::make('diskon2')
+                                    ->label('Diskon/Potongan Kedua (optional)')
+                                    ->color('primary')
+                                    ->formatStateUsing(function(string $state): string {
+                                        $diskon = str_replace(".",",",$state);
+                                        return __("{$diskon}%");
+                                    }),
+                            ]),
                     ])->columns(4),
             ]);
     }

@@ -23,6 +23,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
+            
             if(!empty($row['nama']))
             {
                 $produk = Models\Produk::where('nama', trim($row['nama']))->first();
@@ -59,8 +60,8 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         'pabrik' => $row['pabrik'],
                         'kemasan' => $kemasan,
                         'diskon' => $row['diskon'],
-                        'harga_beli' => str_replace(",",".",$row['harga_beli']),
-                        'harga_jual' => str_replace(",",".",$row['harga_jual']),
+                        'harga_beli' => $row['harga_beli'],
+                        'harga_jual' => $row['harga_jual'],
                         'satuan_id' => $satuanDasarId,
                     ]);
                 }
@@ -79,10 +80,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         $produk->pabrik = $row['pabrik'];
                     
                     if(($produk->harga_beli == 0) && $row['harga_beli'])
-                        $produk->harga_beli = str_replace(",",".",$row['harga_jual']);
+                        $produk->harga_beli = $row['harga_beli'];
 
                     if(($produk->harga_jual == 0) && $row['harga_jual'])
-                        $produk->harga_jual = str_replace(",",".",$row['harga_jual']);
+                        $produk->harga_jual = $row['harga_jual'];
 
                     if(!$produk->satuan_id && $satuanDasarId)
                         $produk->satuan_id = $satuanDasarId;
@@ -112,20 +113,20 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 if(!empty(trim($row['lokasi'])))
                     $lokasiId = $this->getLokasiId($row['lokasi']);
                 
-                $produk->persediaan()->firstOrCreate(
-                    [
-                        'satuan_id' => $satuanDasarId,
-                        'lokasi_id' => $lokasiId,
-                        'ref' => "",
-                        'no_batch' => $row['nobatch'], 
-                        'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
+                // $produk->persediaan()->firstOrCreate(
+                //     [
+                //         'satuan_id' => $satuanDasarId,
+                //         'lokasi_id' => $lokasiId,
+                //         'ref' => "",
+                //         'no_batch' => $row['nobatch'], 
+                //         'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
                         
-                    ],
-                    [
-                        'harga_beli' => str_replace(",",".",$row['harga_beli']),
-                        'stok' => $row['stok'],
-                    ]
-                );
+                //     ],
+                //     [
+                //         'harga_beli' => str_replace(",",".",$row['harga_beli']),
+                //         'stok' => $row['stok'],
+                //     ]
+                // );
 
             }
         }

@@ -21,7 +21,7 @@
             :wire:click="'previousPage(\'' . $paginator->getPageName() . '\')'"
             @class([
                 'justify-self-start',
-                'inline-grid md:hidden' => ! $isSimple,
+                'inline-grid lg:hidden' => ! $isSimple,
             ])
             :wire:key="$this->getId() . '.pagination.previous'"
         >
@@ -31,7 +31,7 @@
 
     @if (! $isSimple)
         <span
-            class="hidden text-sm font-medium text-gray-700 dark:text-gray-200 md:inline"
+            class="hidden text-sm font-medium text-gray-700 dark:text-gray-200 lg:inline"
         >
             {{
                 trans_choice(
@@ -49,7 +49,7 @@
 
     @if (count($pageOptions) > 1)
         <div class="col-start-2 justify-self-center">
-            <label class="sm:hidden">
+            <label class="md:hidden">
                 <x-filament::input.wrapper>
                     <x-filament::input.select
                         :wire:model.live="$currentPageOptionProperty"
@@ -67,7 +67,7 @@
                 </span>
             </label>
 
-            <label class="hidden sm:inline">
+            <label class="hidden md:inline">
                 <x-filament::input.wrapper
                     :prefix="__('filament::components/pagination.fields.records_per_page.label')"
                 >
@@ -93,7 +93,7 @@
             :wire:key="$this->getId() . '.pagination.next'"
             @class([
                 'col-start-3 justify-self-end',
-                'inline-grid md:hidden' => ! $isSimple,
+                'inline-grid lg:hidden' => ! $isSimple,
             ])
         >
             {{ __('filament::components/pagination.actions.next.label') }}
@@ -102,7 +102,7 @@
 
     @if ((! $isSimple) && $paginator->hasPages())
         <ol
-            class="hidden justify-self-end bg-white shadow-sm ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/20 md:flex"
+            class="hidden justify-self-end bg-white shadow-sm ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/20 lg:flex"
         >
             @if (! $paginator->onFirstPage())
                 <x-filament::pagination.item
@@ -115,6 +115,7 @@
                 />
             @endif
 
+            
             @foreach ($paginator->render()->offsetGet('elements') as $element)
                 @if (is_string($element))
                     <x-filament::pagination.item disabled :label="$element" />

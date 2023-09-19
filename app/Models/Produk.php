@@ -18,7 +18,7 @@ class Produk extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['kode', 'barcode', 'nama', 'satuan_id', 'deskripsi', 'pabrik', 'kemasan', 'minimal_stok', 'harga_beli', 'harga_jual', 'diskon', 'margin_harga', 'digunakan', 'created_by', 'last_edited_by'];
+    protected $fillable = ['kode', 'barcode', 'nama', 'satuan_id', 'deskripsi', 'pabrik', 'kemasan', 'minimal_stok', 'harga_beli', 'harga_jual', 'diskon', 'diskon2', 'margin_harga', 'digunakan', 'created_by', 'last_edited_by'];
 
     public function nama(): Attribute
     {
@@ -44,14 +44,14 @@ class Produk extends Model
     public function hargaBeli(): Attribute
     {
         return new Attribute(
-            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
+            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
         );
     }
 
     public function hargaJual(): Attribute
     {
         return new Attribute(
-            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
+            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
         );
     }
 
@@ -59,7 +59,23 @@ class Produk extends Model
     {
         return new Attribute(
             get: fn($value) => floatval($value),
-            set: fn($value) => ($value)?str_replace(",",".",$value):$value,
+            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+        );
+    }
+
+    public function diskon(): Attribute
+    {
+        return new Attribute(
+            get: fn($value) => floatval($value),
+            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+        );
+    }
+
+    public function diskon2(): Attribute
+    {
+        return new Attribute(
+            get: fn($value) => floatval($value),
+            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
         );
     }
 
