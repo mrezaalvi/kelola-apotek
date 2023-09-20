@@ -1,0 +1,8 @@
+Troubleshoot
+
+File import (download) tidak ditemukan
+========================================
+Hal ini terjadi ketika folder aplikasi baru diinstall atau dipindahkan
+lakukan instruksi berikut:
+- Buka folder public, hapus folder/shortcut files-import jika ada
+- Jalankan perintah : php artisan storage:link

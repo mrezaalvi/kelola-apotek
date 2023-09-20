@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->favicon(asset('images/favicon.ico'))
             ->font('Poppins')
             ->darkMode(false)
@@ -67,6 +68,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarCollapsibleOnDesktop()
             ->databaseNotifications()
-            ->databaseNotificationsPolling('30s');;
+            ->databaseNotificationsPolling('30s');
     }
 }

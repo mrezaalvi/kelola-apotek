@@ -44,14 +44,14 @@ class Produk extends Model
     public function hargaBeli(): Attribute
     {
         return new Attribute(
-            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+            set: fn($value) => toDBDecimalFormat($value),
         );
     }
 
     public function hargaJual(): Attribute
     {
         return new Attribute(
-            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+            set: fn($value) => toDBDecimalFormat($value),
         );
     }
 
@@ -59,7 +59,7 @@ class Produk extends Model
     {
         return new Attribute(
             get: fn($value) => floatval($value),
-            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+            set: fn($value) => toDBDecimalFormat($value),
         );
     }
 
@@ -67,7 +67,7 @@ class Produk extends Model
     {
         return new Attribute(
             get: fn($value) => floatval($value),
-            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+            set: fn($value) => toDBDecimalFormat($value),
         );
     }
 
@@ -75,7 +75,7 @@ class Produk extends Model
     {
         return new Attribute(
             get: fn($value) => floatval($value),
-            set: fn($value) => (is_numeric($value))?str_replace(",",".",$value):0,
+            set: fn($value) => toDBDecimalFormat($value),
         );
     }
 

@@ -228,7 +228,6 @@ class ProdukResource extends Resource
                                     ->numeric()
                                     ->placeholder('0,00')
                                     ->live()
-                                    // ->disabled(fn(Forms\Get $get)=>$get('use_margin'))
                                     ->hint(function(Forms\Get $get){
                                         $gunakanMargin = $get('use_margin');
                                         $hargaBeli = floatval($get('harga_beli'));
@@ -240,7 +239,7 @@ class ProdukResource extends Resource
                                             $marginHarga = number_format((($hargaJual - $hargaBeli)/$hargaBeli)*100,2);
                                         return "Margin : ".$marginHarga."%";
                                     })
-                                    ->hintColor('primary')          
+                                    ->hintColor('info')          
                                     ->extraInputAttributes(function(Forms\Get $get){
                                         $attribute = ['class' => 'text-end'];
                                         $readOnlyAttribute = ['class'=>'text-end bg-gray-200','readonly' => 'true'];
@@ -260,12 +259,13 @@ class ProdukResource extends Resource
                                             ->hint(function(Forms\Get $get, ?string $state){
                                                 $hargaJual = floatval($get('harga_jual'));
                                                 $diskon = floatval($state);
-                                                $label = "Harga jual setelah diskon";
+                                                $label = "Harga setelah diskon : ";
                                                 if(floatval($hargaJual)!=0)
-                                                    return $hargaJual - ($hargaJual * ($diskon/100));
+                                                    return $label.number_format($hargaJual - ($hargaJual * ($diskon/100)),2,",",".");
                                                 
-                                                return 0;
+                                                return $label.number_format(0, 2,",",".");
                                             })
+                                            ->hintColor('info')
                                             ->extraInputAttributes(['class' => 'text-end']),
                                     Forms\Components\TextInput::make('diskon2')
                                         ->label('Diskon/Potongan Kedua (Optional)')
@@ -277,15 +277,17 @@ class ProdukResource extends Resource
                                             $hargaJual = floatval($get('harga_jual'));
                                             $diskon = floatval($get('diskon'));
                                             $diskon2 = floatval($state);
-                                            $label = "Harga jual setelah diskon";
-                                            if($hargaJual !=0 && $diskon !=0){
+                                            $label = "Harga setelah diskon 2 : ";
+                                            if($hargaJual != 0 && $diskon != 0){
                                                 $hargaDiskon = $hargaJual - ($hargaJual * ($diskon/100)); 
-                                                return $hargaDiskon - ($hargaDiskon * ($diskon2/100));
+                                                return $label.number_format($hargaDiskon - ($hargaDiskon * ($diskon2/100)), 2, ",", ".");
                                             }
-                                                
-                                            
-                                            return 0;
+                                            if($hargaJual != 0 && $diskon == 0){
+                                                return $label.number_format($hargaJual, 2, ",", ".");
+                                            }   
+                                            return $label.number_format(0,2,",",".");
                                         })
+                                        ->hintColor('info')
                                         ->extraInputAttributes(['class' => 'text-end']),
                                 ]),
                         Forms\Components\Toggle::make('digunakan')
@@ -447,6 +449,7 @@ class ProdukResource extends Resource
                                 Infolists\Components\TextEntry::make('nilai_konversi')
                                     ->label('@ Satuan Dasar'),
                             ])
+                            ->hidden(fn($record)=>$record->multiSatuan()->count()<1)
                             ->columns(2)
                             // ->hidden(fn($record)=>multiSatuan.count())
                             ->columnSpan(2),
@@ -457,8 +460,10 @@ class ProdukResource extends Resource
                         InfoLists\Components\Grid::make()
                             ->columns([
                                 'sm' => 1,
+                                'md' => 2,
                                 'lg' => 2,
-                                'xl' => 4,
+                                'xl' => 3,
+                                '2xl' => 4,
                             ])
                             ->schema([
                                  InfoLists\Components\TextEntry::make('harga_beli')
@@ -473,8 +478,10 @@ class ProdukResource extends Resource
                         InfoLists\Components\Grid::make()
                             ->columns([
                                 'sm' => 1,
+                                'md' => 2,
                                 'lg' => 2,
-                                'xl' => 4,
+                                'xl' => 3,
+                                '2xl' => 4,
                             ])
                             ->schema([
                                 Infolists\Components\TextEntry::make('diskon')

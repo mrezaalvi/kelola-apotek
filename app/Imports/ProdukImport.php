@@ -24,7 +24,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
     {
         foreach ($rows as $row) {
             
-            if(!empty($row['nama']))
+            if(!empty(trim($row['nama'])))
             {
                 $produk = Models\Produk::where('nama', trim($row['nama']))->first();
                 $listSatuan = $this->getSatuan($row['satuan']);
@@ -33,11 +33,13 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 $satuanLanjutan = $listSatuan['satuan_lanjutan'];
 
                 $kemasan = "";
+
                 if(count($satuanLanjutan)>0)
                 {
                     $kemasan .= "1 ";
                     
                     $multiple = 0;
+
                     foreach($satuanLanjutan as $satuan)
                     {
                         $kemasan .= $satuan['nama']." X ".$satuan['nilai_konversi']." ";
@@ -92,11 +94,11 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 }
 
                 $kategoriId = $this->getKategoriId($row['kategori']);
-        
-                if(count($kategoriId)>0)
+                
+                if(count($kategoriId)>0 && $produk)
                     $produk->kategories()->sync($kategoriId, false);
 
-                if(count($satuanLanjutan)>0)
+                if(count($satuanLanjutan)>0 && $produk)
                 {
                     $multiple = 1;
                     foreach($satuanLanjutan as $satuan)
@@ -201,7 +203,6 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
         $kategoriId = [];
         foreach($kategoriNamaArr as $kategoriNama)
         {
-            
             $kategori = Models\Kategori::where('nama', Str::of($kategoriNama)->trim()->upper())->first();
             
             if(!$kategori)
