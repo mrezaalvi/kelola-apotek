@@ -3,7 +3,9 @@
 /public/build
 /public/hot
 /public/files-import
+/public/files-import.ink
 /public/storage
+/public/storage.ink
 /storage/*.key
 /vendor
 backup.sql
