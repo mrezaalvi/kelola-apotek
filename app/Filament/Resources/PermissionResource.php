@@ -87,7 +87,7 @@ class PermissionResource extends Resource
             ])
             ->defaultGroup('group')
             ->paginated([10, 25, 50])
-            ->poll('3s');;
+            ->poll('10s');;
     }
     
     public static function getRelations(): array

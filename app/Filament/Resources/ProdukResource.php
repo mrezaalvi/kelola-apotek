@@ -294,7 +294,6 @@ class ProdukResource extends Resource
                             ->label('Digunakan?')
                             ->default(true),
                     ]),
-                
             ]);
     }
 
@@ -413,7 +412,7 @@ class ProdukResource extends Resource
             ])
             ->striped()
             ->paginated([10, 25, 50])
-            ->poll('3s');
+            ->poll('10s');
     }
     
     public static function infolist(Infolist $infolist): Infolist

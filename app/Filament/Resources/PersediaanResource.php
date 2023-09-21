@@ -88,7 +88,7 @@ class PersediaanResource extends Resource
                     //      ->hidden(! auth()->user()->can('stok: delete')),
                 ]),
             ])
-            ->poll('3s');
+            ->poll('10s');
     }
     
     public static function infolist(Infolist $infolist): Infolist

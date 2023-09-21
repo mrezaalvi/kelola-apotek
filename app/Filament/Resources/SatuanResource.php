@@ -168,7 +168,7 @@ class SatuanResource extends Resource
                     ->icon('heroicon-m-plus'),
             ])
             ->paginated([10, 25, 50])
-            ->poll('3s');
+            ->poll('10s');
     }
     
     public static function getPages(): array

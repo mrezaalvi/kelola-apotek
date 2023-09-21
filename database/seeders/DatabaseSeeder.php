@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             KategoriSeeder::class,
             SatuanSeeder::class,
             LokasiSeeder::class,
+            UpdatePermissionName::class
         ]);
     }
 }
