@@ -62,6 +62,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         'pabrik' => $row['pabrik'],
                         'kemasan' => $kemasan,
                         'diskon' => $row['diskon'],
+                        'diskon2' => (isset($row['diskon2']))?$row['diskon2']:0,
                         'harga_beli' => $row['harga_beli'],
                         'harga_jual' => $row['harga_jual'],
                         'satuan_id' => $satuanDasarId,
@@ -86,6 +87,12 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
                     if(($produk->harga_jual == 0) && $row['harga_jual'])
                         $produk->harga_jual = $row['harga_jual'];
+                    
+                    if(($produk->diskon == 0) && isset($row['diskon']))
+                        $produk->diskon = $row['diskon'];
+
+                    if(($produk->diskon2 == 0) && isset($row['diskon2']))
+                        $produk->diskon2 = $row['diskon2'];
 
                     if(!$produk->satuan_id && $satuanDasarId)
                         $produk->satuan_id = $satuanDasarId;
