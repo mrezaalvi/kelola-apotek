@@ -9,8 +9,10 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\DB;
 use Filament\Support\Enums\IconPosition;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\LokasiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LokasiResource\RelationManagers;
@@ -120,6 +122,14 @@ class LokasiResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
+                        ->action(function(Collection $records){
+                            $records->each(function($record){
+                                DB::transaction(function () use ($record) {
+                                    if($record->nama != 'GUDANG UTAMA')
+                                        $record->delete();
+                                });
+                            });
+                        })
                         ->hidden(! auth()->user()->can('location: delete')),
                 ]),
             ])

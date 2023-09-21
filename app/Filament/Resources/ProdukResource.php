@@ -103,6 +103,7 @@ class ProdukResource extends Resource
                                             )
                                             ->searchable()
                                             ->preload()
+                                            ->required()
                                             ->createOptionForm([
                                                 Forms\Components\TextInput::make('nama')
                                                     ->unique(ignoreRecord: true)
@@ -110,8 +111,10 @@ class ProdukResource extends Resource
                                             ]),
                                         Forms\Components\TextInput::make('nilai_konversi')
                                             ->label('Nilai Konversi')
+                                            ->numeric()
                                             ->placeholder('0')
                                             ->extraInputAttributes(['class' => 'text-end'])
+                                            ->required()
                                             ->suffix(
                                                 fn(Forms\Get $get)=>
                                                     $get('../../satuan')?Satuan::find($get('../../satuan'))->nama:'satuan'),
@@ -452,12 +455,14 @@ class ProdukResource extends Resource
                             ->schema([
                                 Infolists\Components\TextEntry::make('satuan.nama'),
                                 Infolists\Components\TextEntry::make('nilai_konversi')
-                                    ->label('@ Satuan Dasar'),
+                                    ->label("Nilai Konversi"),
+                                Infolists\Components\TextEntry::make('harga_jual')
+                                    ->label("Harga Jual"),
                             ])
                             ->hidden(fn($record)=>$record->multiSatuan()->count()<1)
-                            ->columns(2)
+                            ->columns(3)
                             // ->hidden(fn($record)=>multiSatuan.count())
-                            ->columnSpan(2),
+                            ->columnSpanFull(),
                     ])->columns(4),
 
                 InfoLists\Components\Section::make('Harga')
