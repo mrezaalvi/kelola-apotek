@@ -88,6 +88,9 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
                     if(($produk->harga_jual == 0) && $row['harga_jual'])
                         $produk->harga_jual = $row['harga_jual'];
+
+                    if(!$produk->kemasan && $kemasan)
+                        $produk->kemasan = $kemasan;
                     
                     if(($produk->diskon == 0) && isset($row['diskon']))
                         $produk->diskon = $row['diskon'];
@@ -111,13 +114,16 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
                 if(count($satuanLanjutan)>0 && $produk)
                 {
+                    krsort($satuanLanjutan);
                     $multiple = 1;
+                    $hargaBeli = floatval((trim($row['harga_beli']))?$row['harga_beli']:0);
+                    $hargaJual = floatval((trim($row['harga_jual']))?$row['harga_jual']:0);
                     foreach($satuanLanjutan as $satuan)
                     {
                         $multiple *= $satuan['nilai_konversi'];
                         $produk->multiSatuan()->updateOrCreate(
                             ['satuan_lanjutan' => $satuan['id'],'nilai_konversi' => $multiple,],
-                            ['harga_beli' => $row['harga_beli'],'harga_jual' => $row['harga_jual'],]
+                            ['harga_beli' => $hargaBeli * $multiple,'harga_jual' => $hargaJual * $multiple,]
                         );
                     }
                 }

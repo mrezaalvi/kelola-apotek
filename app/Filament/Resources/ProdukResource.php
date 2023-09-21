@@ -378,8 +378,20 @@ class ProdukResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make()
+                        ->color('info'),
+                    Tables\Actions\Action::make('multisatuan')
+                        ->label('Multi Satuan')
+                        ->icon('heroicon-m-rectangle-stack')
+                        ->color('primary')
+                        ->url(fn(Produk $produk)=> ProdukResource::getUrl('multisatuan', ['record' => $produk])),
+                    Tables\Actions\Action::make('persediaan')
+                        ->label('Persediaan')
+                        ->icon('heroicon-m-archive-box')
+                        ->color('primary')
+                        ->url(fn(Produk $produk)=>ProdukResource::getUrl('persediaan', ['record' => $produk])),
+                    Tables\Actions\EditAction::make()
+                        ->color('primary'),
                     Tables\Actions\DeleteAction::make()
                         ->before(function(Produk $record){
                             DB::transaction(function () use ($record) {
@@ -457,10 +469,11 @@ class ProdukResource extends Resource
                                 Infolists\Components\TextEntry::make('nilai_konversi')
                                     ->label("Nilai Konversi"),
                                 Infolists\Components\TextEntry::make('harga_jual')
-                                    ->label("Harga Jual"),
+                                    ->label("Harga Jual")
+                                    ->money('idr'),
                             ])
                             ->hidden(fn($record)=>$record->multiSatuan()->count()<1)
-                            ->columns(3)
+                            ->columns(4)
                             // ->hidden(fn($record)=>multiSatuan.count())
                             ->columnSpanFull(),
                     ])->columns(4),
@@ -527,6 +540,8 @@ class ProdukResource extends Resource
             'create' => Pages\CreateProduk::route('/create'),
             'view' => Pages\ViewProduk::route('/{record}'),
             'edit' => Pages\EditProduk::route('/{record}/edit'),
+            'persediaan' => Pages\PersediaanProduk::route('/{record}/persediaan'),
+            'multisatuan' => Pages\MultiSatuanProduk::route('/{record}/multisatuan'),
         ];
     }    
 }
