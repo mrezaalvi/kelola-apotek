@@ -395,7 +395,8 @@ class ProdukResource extends Resource
                                     $record->delete();
                                 });
                             });
-                        }),
+                        })
+                        ->hidden(! auth()->user()->can('product: delete')),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data produk')

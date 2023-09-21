@@ -23,7 +23,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            
+            dd($user_id = auth()->user);
             if(!empty(trim($row['nama'])))
             {
                 $produk = Models\Produk::where('nama', trim($row['nama']))->first();

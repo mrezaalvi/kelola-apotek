@@ -53,6 +53,9 @@ class PermissionResource extends Resource
                 Tables\Columns\TextColumn::make('group')
                     ->label('Group')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Izin Akses')
+                    ->sortable(),
             ])
             ->defaultSort('group')
             ->filters([
@@ -67,6 +70,7 @@ class PermissionResource extends Resource
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
                 //     Tables\Actions\DeleteBulkAction::make(),
+                //          ->hidden(! auth()->user()->can('permission: delete')),
                 // ]),
             ])
             ->emptyStateHeading('Belum ada data izin akses')

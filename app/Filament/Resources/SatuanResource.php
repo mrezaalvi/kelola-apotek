@@ -144,7 +144,8 @@ class SatuanResource extends Resource
                                     ->title('Semua data berhasil dihapus')
                                     ->body('Seluruh data yang dipilih berhasil dihapus')
                                     ->send();
-                        }),
+                        })
+                        ->hidden(! auth()->user()->can('unit: delete')),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data satuan')

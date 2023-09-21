@@ -106,7 +106,8 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->hidden(! auth()->user()->can('user: delete')),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data pengguna')

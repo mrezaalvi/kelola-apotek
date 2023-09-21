@@ -136,7 +136,7 @@ class KategoriResource extends Resource
                                     ->title('Semua data berhasil dihapus')
                                     ->body('Seluruh data yang dipilih berhasil dihapus')
                                     ->send();
-                        }),
+                        })->hidden(! auth()->user()->can('category: delete')),
                 ]),
             ])
             ->emptyStateHeading('Belum ada data kategori')
