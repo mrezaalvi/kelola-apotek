@@ -23,7 +23,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            dd($user_id = auth()->user);
+            
             if(!empty(trim($row['nama'])))
             {
                 $produk = Models\Produk::where('nama', trim($row['nama']))->first();
@@ -66,6 +66,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                         'harga_beli' => $row['harga_beli'],
                         'harga_jual' => $row['harga_jual'],
                         'satuan_id' => $satuanDasarId,
+                        'created_by' => $user_id = auth()->id(),
                     ]);
                 }
                 else
@@ -97,6 +98,9 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                     if(!$produk->satuan_id && $satuanDasarId)
                         $produk->satuan_id = $satuanDasarId;
 
+                    if(auth()->id())
+                        $produk->last_edited_by = auth()->id();
+                        
                     $produk->save();
                 }
 
@@ -118,9 +122,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                     }
                 }
 
-                $lokasiId = Lokasi::find(1)->id;
-                if(!empty(trim($row['lokasi'])))
-                    $lokasiId = $this->getLokasiId($row['lokasi']);
+                if(empty(trim($row['lokasi'])))
+                    $row['lokasi'] = "Gudang Utama";
+                
+                $lokasiId = $this->getLokasiId($row['lokasi']);
                 
                 // $produk->persediaan()->firstOrCreate(
                 //     [
@@ -164,8 +169,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
         
         $satuanDasarRecord = Models\Satuan::where('nama', $satuanDasar)->first();
 
-        if(!$satuanDasarRecord)
-            $satuanDasarRecord = Models\Satuan::create(['nama' => $satuanDasar]);
+        if(!$satuanDasarRecord){
+            $satuanDasarRecord = Models\Satuan::create(['nama' => $satuanDasar, 'created_by' => auth()->id()]);
+        }
+            
         
         $satuan['satuan_dasar'] = [
             'id' => $satuanDasarRecord->id,
@@ -213,7 +220,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
             $kategori = Models\Kategori::where('nama', Str::of($kategoriNama)->trim()->upper())->first();
             
             if(!$kategori)
-                $kategori = Models\Kategori::create(['nama' => $kategoriNama]);
+                $kategori = Models\Kategori::create(['nama' => $kategoriNama, 'created_by' => auth()->id()]);
 
             array_push($kategoriId, $kategori->id);
         }
@@ -230,7 +237,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
         $lokasi = Models\Lokasi::where('nama', trim($lokasiNama))->first();
         if(!$lokasi)
         {
-            $lokasi = Models\Lokasi::create(['nama'=>trim($lokasiNama)]);
+            $lokasi = Models\Lokasi::create(['nama'=>trim($lokasiNama), 'created_by' => auth()->id()]);
         }
         
         return ($lokasi)?->id;

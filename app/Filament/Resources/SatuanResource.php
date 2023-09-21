@@ -81,20 +81,26 @@ class SatuanResource extends Resource
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label('Dibuat oleh')
                     ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat tanggal')
                     ->date('j F Y')
                     ->sortable()
+                    ->default('-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('lastEditedBy.name')
                     ->label('Terakhir diperbarui oleh')
                     ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir diperbarui tanggal')
                     ->date('j F Y')
                     ->sortable()
+                    ->default('Belum pernah diperbarui')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('nama')
@@ -102,7 +108,12 @@ class SatuanResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['last_edited_by'] = auth()->id();
+                
+                        return $data;
+                    }),
                 Tables\Actions\DeleteAction::make()
                     ->before(function($record, Tables\Actions\DeleteAction $action){
                         if(($record->produks()->count()>0) || ($record->multiSatuan()->count()>0))
@@ -156,7 +167,8 @@ class SatuanResource extends Resource
                     ->label('Buat Data Satuan')
                     ->icon('heroicon-m-plus'),
             ])
-            ->paginated([10, 25, 50]);
+            ->paginated([10, 25, 50])
+            ->poll('3s');
     }
     
     public static function getPages(): array

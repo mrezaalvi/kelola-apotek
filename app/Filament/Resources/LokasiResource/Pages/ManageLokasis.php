@@ -15,7 +15,12 @@ class ManageLokasis extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->label('Buat Data Lokasi')
-                ->icon('heroicon-m-plus'),
+                ->icon('heroicon-m-plus')
+                ->mutateFormDataUsing(function (array $data): array {
+                    $data['created_by'] = auth()->id();
+            
+                    return $data;
+                }),
         ];
     }
 }

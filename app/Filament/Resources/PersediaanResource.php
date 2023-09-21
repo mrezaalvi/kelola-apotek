@@ -87,7 +87,8 @@ class PersediaanResource extends Resource
                     // Tables\Actions\DeleteBulkAction::make()
                     //      ->hidden(! auth()->user()->can('stok: delete')),
                 ]),
-            ]);
+            ])
+            ->poll('3s');
     }
     
     public static function infolist(Infolist $infolist): Infolist

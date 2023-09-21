@@ -98,7 +98,8 @@ class RoleResource extends Resource
                     ->label('Buat Grup Pengguna')
                     ->icon('heroicon-m-plus'),
             ])
-            ->paginated([10, 25, 50]);
+            ->paginated([10, 25, 50])
+            ->poll('3s');
     }
     
     public static function getRelations(): array

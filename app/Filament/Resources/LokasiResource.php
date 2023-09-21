@@ -49,6 +49,7 @@ class LokasiResource extends Resource
                                 'gudang' => 'Gudang',
                                 'rak' => 'Rak',
                             ])
+                            ->default('rak')
                             ->required(),
                         Forms\Components\Toggle::make('digunakan')
                             ->label('Digunakan?')
@@ -65,14 +66,41 @@ class LokasiResource extends Resource
                     ->label('Nama Lokasi')
                     ->icon(fn($record)=>($record->nama == 'GUDANG UTAMA')?'heroicon-m-lock-closed':'')
                     ->iconPosition(IconPosition::After)
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis')
+                    ->sortable()
                     ->formatStateUsing(fn (string $state): string => Str::upper($state)),
                 Tables\Columns\IconColumn::make('digunakan')
                     ->label('Digunakan?')
                     ->boolean(),
+                Tables\Columns\TextColumn::make('createdBy.name')
+                    ->label('Dibuat oleh')
+                    ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Dibuat tanggal')
+                    ->date('j F Y')
+                    ->sortable()
+                    ->default('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('lastEditedBy.name')
+                    ->label('Terakhir diperbarui oleh')
+                    ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Terakhir diperbarui tanggal')
+                    ->date('j F Y')
+                    ->sortable()
+                    ->default('Belum pernah diperbarui')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nama')
             ->groups([
                 Tables\Grouping\Group::make('jenis')
                     ->collapsible(true),
@@ -81,7 +109,12 @@ class LokasiResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['last_edited_by'] = auth()->id();
+                
+                        return $data;
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -97,7 +130,8 @@ class LokasiResource extends Resource
                     ->label('Buat Data Lokasi')
                     ->icon('heroicon-m-plus'),
             ])
-            ->paginated([10, 25, 50]);
+            ->paginated([10, 25, 50])
+            ->poll('3s');
     }
     
     public static function getPages(): array

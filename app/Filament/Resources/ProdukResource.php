@@ -339,6 +339,8 @@ class ProdukResource extends Resource
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label('Dibuat oleh')
                     ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat tanggal')
@@ -348,6 +350,8 @@ class ProdukResource extends Resource
                 Tables\Columns\TextColumn::make('lastEditedBy.name')
                     ->label('Terakhir diperbarui oleh')
                     ->sortable()
+                    ->default('-')
+                    ->formatStateUsing(fn (string $state): string => ($state != 'Superuser')?$state:"-")
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir diperbarui tanggal')
@@ -408,7 +412,8 @@ class ProdukResource extends Resource
                     ->icon('heroicon-m-plus'),
             ])
             ->striped()
-            ->paginated([10, 25, 50]);
+            ->paginated([10, 25, 50])
+            ->poll('3s');
     }
     
     public static function infolist(Infolist $infolist): Infolist

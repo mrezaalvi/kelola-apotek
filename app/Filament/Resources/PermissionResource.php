@@ -86,7 +86,8 @@ class PermissionResource extends Resource
                 ->collapsible(true),
             ])
             ->defaultGroup('group')
-            ->paginated([10, 25, 50]);
+            ->paginated([10, 25, 50])
+            ->poll('3s');;
     }
     
     public static function getRelations(): array
