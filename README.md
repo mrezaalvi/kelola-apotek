@@ -21,7 +21,7 @@ git clone https://github.com/mrezaalvi/kelola-apotek.git
 
 * Install dependencies: 
 ```bash
-composer install; npm install; npm run build;
+npm install; npm run build; composer install;
 ``` 
 
 * Copy .env.example to .env:
