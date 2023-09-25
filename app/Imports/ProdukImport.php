@@ -56,8 +56,8 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 {
                     $produk = Models\Produk::firstOrCreate([
                         'nama' => $row['nama'],
-                        'kode' => $row['kodesku'],
-                        'barcode' => $row['barcode'],
+                        'kode' => ($row['kodesku'])?trim(trim($row['kodesku'],";"),":"):$row['kodesku'],
+                        'barcode' => ($row['barcode'])?trim(trim($row['barcode'],";"),":"):$row['barcode'],
                         'minimal_stok' => $row['stok_minimum'],
                         'pabrik' => $row['pabrik'],
                         'kemasan' => $kemasan,
