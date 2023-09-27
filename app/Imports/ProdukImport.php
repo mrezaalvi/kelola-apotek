@@ -37,12 +37,10 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 if(count($satuanLanjutan)>0)
                 {
                     $kemasan .= "1 ";
-                    
-                    $multiple = 0;
 
                     foreach($satuanLanjutan as $satuan)
                     {
-                        $kemasan .= $satuan['nama']." X ".$satuan['nilai_konversi']." ";
+                        $kemasan .= $satuan['nama']." isi ".$satuan['nilai_konversi']." ";
                     }
                     $kemasan .= $listSatuan['satuan_dasar']['nama'];
                 }
@@ -112,7 +110,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 if(count($kategoriId)>0 && $produk)
                     $produk->kategories()->sync($kategoriId, false);
 
-                if(count($satuanLanjutan)>0 && $produk)
+                if(count($satuanLanjutan)>0 && $produk && $produk->multiSatuan()->count()<1)
                 {
                     krsort($satuanLanjutan);
                     $multiple = 1;
@@ -121,9 +119,9 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                     foreach($satuanLanjutan as $satuan)
                     {
                         $multiple *= $satuan['nilai_konversi'];
-                        $produk->multiSatuan()->updateOrCreate(
-                            ['satuan_lanjutan' => $satuan['id'],'nilai_konversi' => $multiple,],
-                            ['harga_beli' => $hargaBeli * $multiple,'harga_jual' => $hargaJual * $multiple,]
+                        $produk->multiSatuan()->firstOrCreate(
+                            ['satuan_lanjutan' => $satuan['id']],
+                            ['nilai_konversi' => $multiple,'harga_beli' => $hargaBeli * $multiple,'harga_jual' => $hargaJual * $multiple,]
                         );
                     }
                 }

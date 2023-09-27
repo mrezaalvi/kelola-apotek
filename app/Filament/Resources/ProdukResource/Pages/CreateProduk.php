@@ -20,7 +20,6 @@ class CreateProduk extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = auth()->id();
-    
         return $data;
     }
 
@@ -34,10 +33,5 @@ class CreateProduk extends CreateRecord
         });
         return $produkCreated;
     }
-
-    // protected function afterCreate(): void
-    // {
-    //     // Runs after the form fields are saved to the database.
-    // }
     
 }

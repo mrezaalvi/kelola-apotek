@@ -132,7 +132,9 @@ class ProdukResource extends Resource
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('pabrik'),
-                                Forms\Components\TextInput::make('kemasan'),
+                                Forms\Components\TextInput::make('kemasan')
+                                    ->disabled()
+                                    ->dehydrated(false),
                             ]),
                         
                         Forms\Components\TextInput::make('minimal_stok')
@@ -314,6 +316,8 @@ class ProdukResource extends Resource
                 Tables\Columns\TextColumn::make('satuan.nama')
                     ->label('Satuan Dasar')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('kemasan')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('kategories.nama')
                     ->label('Kategori')
                     ->searchable()
@@ -332,8 +336,7 @@ class ProdukResource extends Resource
                     ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('kemasan')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
                 Tables\Columns\TextColumn::make('pabrik')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('digunakan')
@@ -411,7 +414,7 @@ class ProdukResource extends Resource
                                     $record->multiSatuan()->delete();
                                     $record->persediaan()->delete();
                                     $record->delete();
-                                });
+                                },5);
                             });
                         })
                         ->hidden(! auth()->user()->can('product: delete')),

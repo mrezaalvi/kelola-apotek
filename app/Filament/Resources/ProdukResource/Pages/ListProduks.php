@@ -5,6 +5,8 @@ namespace App\Filament\Resources\ProdukResource\Pages;
 use Filament\Forms;
 use Filament\Actions;
 use App\Imports\ProdukImport;
+use App\Exports\ProdukExport;
+use Maatwebsite;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Support\Enums\Alignment;
 use App\Forms\Components\FileDownload;
@@ -19,6 +21,18 @@ class ListProduks extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('produk-export')
+                ->label('Export Produk')
+                ->outlined()
+                ->icon('heroicon-s-arrow-down-tray')
+                ->modalButton('Export Data Produk')
+                ->action(
+                    function(array $data){
+                        return Excel::download(new ProdukExport, 'produk-export-'.now()->format('YmdHis').'.csv');
+                    }
+                )
+                ->hidden(! auth()->user()->hasPermissionTo('product: export')),
+
             Actions\Action::make('produk-import')
                 ->label('Import Produk')
                 ->outlined()
@@ -45,6 +59,7 @@ class ListProduks extends ListRecords
                     }
                 )
                 ->hidden(! auth()->user()->hasPermissionTo('product: import')),
+            
             Actions\CreateAction::make()
                 ->label('Buat Data Produk')
                 ->icon('heroicon-m-plus'),
