@@ -2,25 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Support;
 use App\Models\Produk;
 use App\Models\Satuan;
+use App\Filament\Resources\ProdukResource\Pages;
+use App\Filament\Resources\ProdukResource\RelationManagers;
+
+use Filament\Forms;
 use Filament\Infolists;
-use Filament\Support\RawJs;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\RawJs;
+use Filament\Tables;
+use Filament\Tables\Enums\ActionsPosition;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\Alignment;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\ActionsPosition;
-use Illuminate\Database\Eloquent\Collection;
-use App\Filament\Resources\ProdukResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Wallo\FilamentSelectify\Components\ButtonGroup;
-use App\Filament\Resources\ProdukResource\RelationManagers;
+use Illuminate\Database\Eloquent;
 
 class ProdukResource extends Resource
 {
@@ -98,7 +97,7 @@ class ProdukResource extends Resource
                                             ->relationship(
                                                 'satuan', 
                                                 'nama',
-                                                fn(Builder $query, Forms\Get $get) 
+                                                fn(Eloquent\Builder $query, Forms\Get $get) 
                                                     => $query->where('id', '!=', $get('../../satuan')) 
                                             )
                                             ->searchable()
@@ -140,9 +139,6 @@ class ProdukResource extends Resource
                         Forms\Components\TextInput::make('minimal_stok')
                             ->label('Stok Minimal')
                             ->numeric()
-                            // ->mask(RawJs::make(<<<'JS'
-                            //     $money($input, ',', '.', 2)
-                            // JS))
                             ->placeholder('0')
                             ->default(0)
                             ->extraAttributes(['class' => 'max-w-xs'])
@@ -385,7 +381,7 @@ class ProdukResource extends Resource
                         ->color('info'),
                     Tables\Actions\Action::make('multisatuan')
                         ->label('Multi Satuan')
-                        ->icon('heroicon-m-rectangle-stack')
+                        ->icon('heroicon-m-square-3-stack-3d')
                         ->color('primary')
                         ->url(fn(Produk $produk)=> ProdukResource::getUrl('multisatuan', ['record' => $produk])),
                     Tables\Actions\Action::make('persediaan')
@@ -407,7 +403,7 @@ class ProdukResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->action(function(Collection $records){
+                        ->action(function(Eloquent\Collection $records){
                             $records->each(function($record){
                                 DB::transaction(function () use ($record) {
                                     $record->kategories()->detach();
@@ -532,7 +528,7 @@ class ProdukResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\PersediaanRelationManager::class,
         ];
     }
     

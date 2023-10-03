@@ -58,17 +58,20 @@ class PersediaanResource extends Resource
                     ->numeric()
                     ->alignment(Alignment::Center),
                 Tables\Columns\TextColumn::make('no_batch')
-                    ->label('Nomor Batch'),
+                    ->label('Nomor Batch')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('tgl_exp')
                     ->label('Tanggal Expired')
                     ->alignment(Alignment::Center)
-                    ->date('d/m/Y'),
+                    ->date('d/m/Y')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('harga_beli')
                     ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
             ])
-             ->groups([
+            ->defaultSort('no_batch')
+            ->groups([
                 Group::make('produks.nama')
                     ->label('Produk')
                     ->collapsible(),

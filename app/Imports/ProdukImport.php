@@ -131,20 +131,40 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 
                 $lokasiId = $this->getLokasiId($row['lokasi']);
                 
-                // $produk->persediaan()->firstOrCreate(
-                //     [
-                //         'satuan_id' => $satuanDasarId,
-                //         'lokasi_id' => $lokasiId,
-                //         'ref' => "",
-                //         'no_batch' => $row['nobatch'], 
-                //         'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
-                        
-                //     ],
-                //     [
-                //         'harga_beli' => str_replace(",",".",$row['harga_beli']),
-                //         'stok' => $row['stok'],
-                //     ]
-                // );
+                if($produk->satuan && $lokasiId){
+                    $persediaan = $produk->persediaan()
+                        ->where([
+                            'satuan_id'=>($produk->satuan)?->id, 
+                            'lokasi_id' => $lokasiId, 
+                            'ref' => "",
+                            'no_batch' => $row['nobatch'],
+                            'harga_beli' => $row['harga_beli'],
+                        ])->first();
+
+                    if(!$persediaan)
+                    {                       
+                        $produk->persediaan()->firstOrCreate(
+                            [
+                                'satuan_id' => ($produk->satuan)?->id,
+                                'lokasi_id' => $lokasiId,
+                                'ref' => "",
+                                'no_batch' => ($row['nobatch'])?trim(trim($row['nobatch'],";"),":"):$row['nobatch'], 
+                                'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
+                                'harga_beli' => $row['harga_beli'],                                
+                            ],
+                            [                                
+                                'stok' => ($row['stok'])?$row['stok']:0,
+                            ]
+                        );
+                    }
+                    else
+                    {
+                        $persediaan->stok += ($row['stok'])?$row['stok']:0; 
+                        $persediaan->save();
+                    }
+
+                }
+                
 
             }
         }
