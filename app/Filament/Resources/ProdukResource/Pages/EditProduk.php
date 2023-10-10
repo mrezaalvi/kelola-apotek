@@ -25,6 +25,14 @@ class EditProduk extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['update_all_price'] = true;
+        $data['update_all_diskon'] = true;
+    
+        return $data;
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $data['last_edited_by'] = auth()->id();
@@ -43,7 +51,26 @@ class EditProduk extends EditRecord
                 $data['kemasan'] = null;
             }
             $record->update($data);
+
+            foreach($record->multiSatuan as $multiSatuan)
+            {
+                if($data['update_all_price'])
+                {
+                    $multiSatuan->harga_beli = $this->record->harga_beli * $multiSatuan->nilai_konversi;
+                    $multiSatuan->harga_jual = $this->record->harga_jual * $multiSatuan->nilai_konversi;
+                }
+
+                if($data['update_all_diskon'])
+                {     
+                    $multiSatuan->diskon = $this->record->diskon;
+                    $multiSatuan->diskon2 = $this->record->diskon2;
+                }
+
+                $multiSatuan->save();
+            }
             
+            
+
             $record->kemasan = $this->getKemasan($record);
             $record->save();
         }, 5);

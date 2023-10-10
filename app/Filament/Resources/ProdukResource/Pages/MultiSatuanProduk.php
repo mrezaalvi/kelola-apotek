@@ -152,6 +152,8 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                             ->defaultItems(0)
                             ->hidden(fn(Forms\Get $get)=>!$get('satuan'))
                             ->reorderable(false)
+                            ->addable(false)
+                            ->deletable(false)
                             ->reorderableWithButtons(),
                     ]),
         ])

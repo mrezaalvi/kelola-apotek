@@ -11,13 +11,17 @@
         scrollbar-color: rgb(var(--primary-500)) rgb(var(--gray-200));
         /* scroll thumb and track */
     }
+
+    .filepond--root {
+        border-radius: 0 !important;
+    }
+
+    .filepond--file {
+        border-radius: 0 !important;
+    }
 }
 
 @layer components {
-    .filepond--root {
-        @apply mb-0 overflow-hidden bg-white shadow-sm ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/20;
-    }
-
     .fi-ta-content::-webkit-scrollbar,
     .fi-sidebar-nav::-webkit-scrollbar {
         @apply w-2 h-2;

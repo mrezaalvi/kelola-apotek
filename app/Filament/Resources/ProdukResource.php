@@ -171,8 +171,8 @@ class ProdukResource extends Resource
                                     })                                    
                                     ->extraAttributes(['class' => 'max-w-xs'])
                                     ->extraInputAttributes(['class' => 'text-end']),
-                                Forms\Components\Checkbox::make('use_margin')
-                                    ->label('Gunakan Margin')
+                                Forms\Components\Toggle::make('use_margin')
+                                    ->label('Gunakan Margin?')
                                     ->dehydrated(false)
                                     ->live()
                                     ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
@@ -193,9 +193,7 @@ class ProdukResource extends Resource
                                             return $set('harga_jual', $hargaJual);
                                         }
                                     })
-                                    ->extraAttributes(['class' => 'max-w-xs'])
-                                    ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk menggunakan margin.</span>'))
-                                    ->extraInputAttributes(['class' => 'items-end']),
+                                    ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk menggunakan margin.</span>')),
                             ])->columns(1),
                         Forms\Components\Grid::make(2)
                             ->schema([
@@ -249,6 +247,11 @@ class ProdukResource extends Resource
                                         return $attribute;
                                     }),
                             ]),
+                            Forms\Components\Toggle::make('update_all_price')
+                                    ->label('Terapkan pada seluruh satuan?')
+                                    ->default(true)
+                                    ->hiddenOn('create')
+                                    ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk memperbarui harga pada multi satuan.</span>')),
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('diskon')
@@ -291,6 +294,11 @@ class ProdukResource extends Resource
                                         ->hintColor('info')
                                         ->extraInputAttributes(['class' => 'text-end']),
                                 ]),
+                                Forms\Components\Toggle::make('update_all_diskon')
+                                    ->label('Terapkan pada multi satuan?')
+                                    ->default(true)
+                                    ->hiddenOn('create')
+                                    ->helperText(new HtmlString('<span class="text-primary-500">Aktifkan untuk memperbarui diskon pada seluruh satuan.</span>')),
                         Forms\Components\Toggle::make('digunakan')
                             ->label('Digunakan?')
                             ->default(true),
@@ -407,7 +415,8 @@ class ProdukResource extends Resource
                             $records->each(function($record){
                                 DB::transaction(function () use ($record) {
                                     $record->kategories()->detach();
-                                    $record->multiSatuan()->delete();
+                                    $record->multiSatuan()->delete();L; -
+                                     
                                     $record->persediaan()->delete();
                                     $record->delete();
                                 },5);
