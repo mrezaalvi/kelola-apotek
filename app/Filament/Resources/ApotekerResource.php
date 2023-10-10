@@ -88,16 +88,17 @@ class ApotekerResource extends Resource
                                         Forms\Components\DatePicker::make('stra_exp_date')
                                             ->label('Berlaku sampai tanggal')
                                             ->format('d/m/Y')
-                                            ->minDate(now()),
+                                            ->minDate(now())
+                                            ->maxDate(now()->addYear(10)),
                                         Forms\Components\FileUpload::make('stra_file')
                                             ->label('Berkas STRA')
                                             ->getUploadedFileNameForStorageUsing(
-                                                fn (Forms\Get $get): string => $get('stra_no').".pdf",
+                                                fn (Forms\Get $get): string => "stra-".$get('stra_no').".pdf",
                                             )
                                             ->acceptedFileTypes(['application/pdf'])
                                             ->downloadable()
                                             ->disk('file-apotek')
-                                            ->directory('files-apotek')
+                                            ->directory('apoteker')
                                             ->visibility('public')
                                             ->hint('Format berkas *.pdf'),
                                     ]),
@@ -118,16 +119,17 @@ class ApotekerResource extends Resource
                                         Forms\Components\DatePicker::make('sipa_exp_date')
                                             ->label('Berlaku sampai tanggal')
                                             ->format('d/m/Y')
-                                            ->minDate(now()),
+                                            ->minDate(now())
+                                            ->maxDate(now()->addYear(10)),
                                         Forms\Components\FileUpload::make('sipa_file')
                                             ->label('Berkas SIPA')
                                             ->getUploadedFileNameForStorageUsing(
-                                                fn (Forms\Get $get): string => $get('sipa_no').".pdf",
+                                                fn (Forms\Get $get): string => "sipa-".$get('sipa_no').".pdf",
                                             )
                                             ->acceptedFileTypes(['application/pdf'])
                                             ->downloadable()
                                             ->disk('file-apotek')
-                                            ->directory('files-apotek')
+                                            ->directory('apoteker')
                                             ->visibility('public')
                                             ->hint('Format berkas *.pdf'),
                                     ]),
@@ -281,7 +283,6 @@ class ApotekerResource extends Resource
                                 ]),
                             Infolists\Components\TextEntry::make('stra_file')
                                 ->label('Berkas STRA')
-                                ->dateTime('j F Y')
                                 ->columnSpan([
                                     'lg' => 1,
                                 ]),
@@ -307,7 +308,6 @@ class ApotekerResource extends Resource
                                 ]),
                             Infolists\Components\TextEntry::make('sipa_file')
                                 ->label('Berkas SIPA')
-                                ->dateTime('j F Y')
                                 ->columnSpan([
                                     'lg' => 1,
                                 ]),
