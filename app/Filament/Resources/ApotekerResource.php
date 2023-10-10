@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\ActionsPosition;
 use App\Filament\Resources\ApotekerResource\Pages;
@@ -283,6 +284,8 @@ class ApotekerResource extends Resource
                                 ]),
                             Infolists\Components\TextEntry::make('stra_file')
                                 ->label('Berkas STRA')
+                                ->url(fn (Apoteker $record): string => Storage::disk('files-apotek')->url($record->stra_file))
+                                ->openUrlInNewTab()
                                 ->columnSpan([
                                     'lg' => 1,
                                 ]),

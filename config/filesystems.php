@@ -64,7 +64,7 @@ return [
             'throw' => false,
         ],
 
-        'file-apotek' => [
+        'files-apotek' => [
             'driver' => 'local',
             'root' => storage_path('app/files-apotek'),
             'url' => env('APP_URL').'/files-apotek',
