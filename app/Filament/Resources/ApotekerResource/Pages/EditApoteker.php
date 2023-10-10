@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\SupplierResource\Pages;
+namespace App\Filament\Resources\ApotekerResource\Pages;
 
-use App\Filament\Resources\SupplierResource;
+use App\Filament\Resources\ApotekerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditSupplier extends EditRecord
+class EditApoteker extends EditRecord
 {
-    protected static string $resource = SupplierResource::class;
+    protected static string $resource = ApotekerResource::class;
 
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
-
+    
     protected function getHeaderActions(): array
     {
         return [

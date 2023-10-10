@@ -43,7 +43,7 @@ class UpdatePermissionName extends Seeder
             ],
         ];
 
-        $this->command->warn(PHP_EOL . 'Creating permission...');
+        $this->command->warn(PHP_EOL . 'Updating permission...');
         $progressBar = new ProgressBar($this->command->getOutput(), count($permissions));
 
         foreach($permissions as $permission)

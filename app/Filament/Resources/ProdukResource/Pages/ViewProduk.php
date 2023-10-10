@@ -21,17 +21,17 @@ class ViewProduk extends ViewRecord
                 ->icon('heroicon-m-arrow-uturn-left')
                 ->url(fn()=>ProdukResource::getUrl()),
             Actions\ActionGroup::make([
-                    Actions\Action::make('edit-multisatuan')
-                        ->label('Multi Satuan/Harga')
-                        ->color('primary')
-                        ->icon('heroicon-m-square-3-stack-3d')
-                        ->outlined()
-                        ->url(fn()=>$this->getResource()::getUrl('multisatuan', ['record'=>$this->record])),
-                    Actions\EditAction::make()
-                        ->label('Ubah')
-                        ->color('primary')
-                        ->icon('heroicon-m-pencil'),
-                ]),
+                Actions\Action::make('edit-multisatuan')
+                    ->label('Multi Satuan/Harga')
+                    ->color('primary')
+                    ->icon('heroicon-m-square-3-stack-3d')
+                    ->outlined()
+                    ->url(fn()=>$this->getResource()::getUrl('multisatuan', ['record'=>$this->record])),
+                Actions\EditAction::make()
+                    ->label('Ubah')
+                    ->color('primary')
+                    ->icon('heroicon-m-pencil'),
+            ]),
             
             
         ];

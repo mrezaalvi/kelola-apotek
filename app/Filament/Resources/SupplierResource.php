@@ -8,6 +8,9 @@ use App\Models\Supplier;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
+use Filament\Support;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\ActionsPosition;
 use App\Filament\Resources\SupplierResource\Pages;
@@ -119,7 +122,7 @@ class SupplierResource extends Resource
                 Tables\Columns\IconColumn::make('digunakan')
                     ->label('Digunakan?')
                     ->boolean(),
-                    Tables\Columns\TextColumn::make('createdBy.name')
+                Tables\Columns\TextColumn::make('createdBy.name')
                     ->label('Dibuat oleh')
                     ->sortable()
                     ->default('-')
@@ -174,6 +177,84 @@ class SupplierResource extends Resource
             ->poll('10s');
     }
     
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Informasi Data Supplier')
+                    ->icon('heroicon-m-information-circle')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('nama')
+                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                            ->weight(Support\Enums\FontWeight::Bold)
+                            ->columnSpan([
+                                'default' => 1,
+                                'lg' => 4,
+                            ]),
+                        Infolists\Components\TextEntry::make('no_telp')
+                            ->label('No. Telp')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500)
+                            ->columnSpan([
+                                'lg' => 1,
+                            ]),
+                        Infolists\Components\TextEntry::make('email')
+                            ->label('Email')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500)
+                            ->columnSpan([
+                                'lg' => 1,
+                            ]),
+                        Infolists\Components\TextEntry::make('alamat')
+                            ->label('Alamat')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500)
+                            ->columnSpan([
+                                'lg' => 4,
+                            ]),
+                    ])
+                    ->columns([
+                        'default' => 1,
+                        'lg' => 4,
+                    ]),
+                Infolists\Components\Section::make('Informasi Data Sales')
+                    ->icon('heroicon-m-information-circle')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('sales')
+                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                            ->weight(Support\Enums\FontWeight::Bold)
+                            ->columnSpan([
+                                'default' => 1,
+                                'lg' => 4,
+                            ]),
+                        Infolists\Components\TextEntry::make('no_telp_sales')
+                            ->label('No. Telp')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500)
+                            ->columnSpan([
+                                'lg' => 1,
+                            ]),
+                        Infolists\Components\TextEntry::make('email_sales')
+                            ->label('Email')
+                            ->copyable()
+                            ->copyMessage('Salin!')
+                            ->copyMessageDuration(1500)
+                            ->columnSpan([
+                                'lg' => 1,
+                            ]),
+                    ])
+                    ->columns([
+                        'default' => 1,
+                        'lg' => 4,
+                    ]),               
+            
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
