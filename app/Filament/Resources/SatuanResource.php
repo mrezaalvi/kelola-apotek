@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use App\Filament\Resources\SatuanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SatuanResource\RelationManagers;
@@ -108,25 +109,29 @@ class SatuanResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['last_edited_by'] = auth()->id();
-                
-                        return $data;
-                    }),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function($record, Tables\Actions\DeleteAction $action){
-                        if(($record->produks()->count()>0) || ($record->multiSatuan()->count()>0))
-                        {
-                            Notification::make()
-                                ->warning()
-                                ->title('Data '.$record->nama.' telah digunakan pada data yang lain!')
-                                ->body('Silahkan ubah atau hapus data yang terhubung dengan data ini')
-                                ->send();
-                            $action->cancel();
-                        }
-                    }),        
-            ])
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('primary')
+                        ->mutateFormDataUsing(function (array $data): array {
+                            $data['last_edited_by'] = auth()->id();
+                    
+                            return $data;
+                        }),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function($record, Tables\Actions\DeleteAction $action){
+                            if(($record->produks()->count()>0) || ($record->multiSatuan()->count()>0))
+                            {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Data '.$record->nama.' telah digunakan pada data yang lain!')
+                                    ->body('Silahkan ubah atau hapus data yang terhubung dengan data ini')
+                                    ->send();
+                                $action->cancel();
+                            }
+                        }),
+                ]),
+                        
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

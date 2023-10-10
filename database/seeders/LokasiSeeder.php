@@ -25,20 +25,24 @@ class LokasiSeeder extends Seeder
             ],
         ];
 
-        $this->command->warn(PHP_EOL . 'Membuat data lokasi...');
-        $progressBar = new ProgressBar($this->command->getOutput(), count($lokasis));
-
-        foreach($lokasis as $lokasi)
+        if(!Lokasi::exists())
         {
-            Lokasi::firstOrCreate([
-                 'nama'  => $lokasi['nama'],
-                 'jenis'  => $lokasi['jenis'],
-            ]);
+            $this->command->warn(PHP_EOL . 'Membuat data lokasi...');
+            $progressBar = new ProgressBar($this->command->getOutput(), count($lokasis));
+    
+            foreach($lokasis as $lokasi)
+            {
+                Lokasi::firstOrCreate([
+                    'nama'  => $lokasi['nama'],
+                    'jenis'  => $lokasi['jenis'],
+                ]);
 
-            $progressBar->advance();
-        }
-
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
+                $progressBar->advance();
+            }
+            
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
+        }   
+        
     }
 }

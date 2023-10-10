@@ -27,19 +27,23 @@ class SatuanSeeder extends Seeder
             'Dus',
         ];
 
-        $this->command->warn(PHP_EOL . 'Membuat data satuan...');
-        $progressBar = new ProgressBar($this->command->getOutput(), count($satuans));
-
-        foreach($satuans as $satuan)
+        if(!Satuan::exists())
         {
-            Satuan::firstOrCreate([
-                 'nama'  => $satuan,
-            ]);
+            $this->command->warn(PHP_EOL . 'Membuat data satuan...');
+            $progressBar = new ProgressBar($this->command->getOutput(), count($satuans));
 
-            $progressBar->advance();
+            
+            foreach($satuans as $satuan)
+            {
+                Satuan::firstOrCreate([
+                    'nama'  => $satuan,
+                ]);
+
+                $progressBar->advance();
+            }
+
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
         }
-
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
-    }
+    }   
 }

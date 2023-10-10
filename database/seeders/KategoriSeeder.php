@@ -24,20 +24,24 @@ class KategoriSeeder extends Seeder
             'Alat Medis',
             'Alat Kesehatan',
         ];
-
-        $this->command->warn(PHP_EOL . 'Membuat data kategori...');
-        $progressBar = new ProgressBar($this->command->getOutput(), count($kategories));
-
-        foreach($kategories as $kategori)
+       
+        if(!Kategori::exists())
         {
-            Kategori::firstOrCreate([
-                 'nama'  => $kategori,
-            ]);
+            $this->command->warn(PHP_EOL . 'Membuat data kategori...');
+            $progressBar = new ProgressBar($this->command->getOutput(), count($kategories));
+    
+            foreach($kategories as $kategori)
+            {
+                Kategori::firstOrCreate([
+                    'nama'  => $kategori,
+                ]);
 
-            $progressBar->advance();
+                $progressBar->advance();
+            }
+            
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
         }
-
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
+            
     }
 }

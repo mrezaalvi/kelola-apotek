@@ -10,6 +10,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Forms\Components\PasswordInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Resources\Pages\ListRecords\Tab;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -43,15 +44,18 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nama')
+                            ->unique(ignoreRecord: true)
                             ->maxLength(150)
                             ->required(),
                         Forms\Components\TextInput::make('username')
                             ->label('Username')
+                            ->unique(ignoreRecord: true)
                             ->disabledOn('edit')
                             ->maxLength(50)
                             ->required(),
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
+                            ->unique(ignoreRecord: true)
                             ->email(),
                         PasswordInput::make('password')
                             ->maxLength(64)
@@ -101,9 +105,8 @@ class UserResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
-                ]),
-                
-            ])
+                ]),  
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

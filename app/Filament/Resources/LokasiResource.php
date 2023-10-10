@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
 use Filament\Support\Enums\IconPosition;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\LokasiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -111,14 +112,17 @@ class LokasiResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['last_edited_by'] = auth()->id();
-                
-                        return $data;
-                    }),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('primary')
+                        ->mutateFormDataUsing(function (array $data): array {
+                            $data['last_edited_by'] = auth()->id();
+                    
+                            return $data;
+                        }),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class PermissionSeederUpdateV1 extends Seeder
 {
@@ -30,35 +33,67 @@ class PermissionSeederUpdateV1 extends Seeder
                 'group' =>  'Persediaan',
             ],
             [
-                'name'  =>  'location: update',
+                'name'  =>  'stock: update',
                 'alias' =>  'Ubah Data Persediaan',
                 'group' =>  'Persediaan',
             ],
             // [
-            //     'name'  =>  'location: delete',
+            //     'name'  =>  'stock: delete',
             //     'alias' =>  'Hapus Data Persediaan',
             //     'group' =>  'Persediaan',
             // ],
+            [
+                'name'  =>  'supplier: view-any',
+                'alias' =>  'Lihat Daftar Supplier',
+                'group' =>  'Data Supplier',
+            ],
+            [
+                'name'  =>  'supplier: view',
+                'alias' =>  'Lihat Detail Supplier',
+                'group' =>  'Data Supplier',
+            ],
+            [
+                'name'  =>  'supplier: create',
+                'alias' =>  'Buat Data Supplier',
+                'group' =>  'Data Supplier',
+            ],
+            [
+                'name'  =>  'supplier: update',
+                'alias' =>  'Ubah Data Supplier',
+                'group' =>  'Data Supplier',
+            ],
+            [
+                'name'  =>  'supplier: delete',
+                'alias' =>  'Hapus Data Supplier',
+                'group' =>  'Data Supplier',
+            ],
         ];
+
+        $superuser = Role::where('name', 'superuser')->first();
+        $pemilik = Role::where('name', 'pemilik')->first();
 
         $this->command->warn(PHP_EOL . 'Creating permission...');
         $progressBar = new ProgressBar($this->command->getOutput(), count($permissions));
 
         foreach($permissions as $permission)
         {
-            $permissionData = Permission::where('name', $permission["name"])->first();
+            $permissionCreated = Permission::firstOrCreate([
+                'name'  => $permission["name"],
+                'alias' => $permission['alias'],
+                'group' => $permission['group'],
+            ]);
 
-            if($permissionData)
-            {
-                $permissionData->alias = $permission['alias']; 
-                $permissionData->group = $permission['group']; 
-                $permissionData->save();
-            }
+            if($superuser && !$pemilik->hasPermissionTo($permissionCreated->name))
+                $superuser->givePermissionTo($permissionCreated);
+            
+            if($pemilik && !$pemilik->hasPermissionTo($permissionCreated->name))
+                $pemilik->givePermissionTo($permissionCreated);
 
             $progressBar->advance();
         }
 
         $progressBar->finish();
         $this->command->getOutput()->writeln('');
+
     }
 }

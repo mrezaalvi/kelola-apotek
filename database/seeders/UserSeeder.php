@@ -216,76 +216,79 @@ class UserSeeder extends Seeder
             'kasir',
         ];
 
-        $this->command->warn(PHP_EOL . 'Creating permission...');
-        $progressBar = new ProgressBar($this->command->getOutput(), count($permissions));
-
-        foreach($permissions as $permission)
+        if(!Permission::exists() && !Role::exists())
         {
-            Permission::firstOrCreate([
-                 'name'  => $permission["name"],
-                 'alias' => $permission['alias'],
-                 'group' => $permission['group'],
-            ]);
+            $this->command->warn(PHP_EOL . 'Creating permission...');
+            $progressBar = new ProgressBar($this->command->getOutput(), count($permissions));
 
-            $progressBar->advance();
-        }
-
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
-
-
-        $this->command->warn(PHP_EOL . 'Creating role...');
-        $progressBar = new ProgressBar($this->command->getOutput(), count($roles));
-
-        foreach($roles as $role)
-        {
-            $createdRole = Role::firstOrCreate([
-                'name' => $role,
-            ]);
-
-            if($role == 'superuser')
-                $createdRole->syncPermissions(Permission::all());
-
-            if($role == 'pemilik')
+            foreach($permissions as $permission)
             {
-                $permissions = Permission::where('name', 'like', 'product:%')->get();
-                $permissions = $permissions->merge(Permission::where('name', 'like', 'category:%')->get());
-                $permissions = $permissions->merge(Permission::where('name', 'like', 'unit:%')->get());
-                $permissions = $permissions->merge(Permission::where('name', 'like', 'location:%')->get());
-                $permissions = $permissions->merge(Permission::where('name', 'like', 'user:%')->get());
-                $permissions = $permissions->merge(Permission::where('name', 'like', 'role:%')->get());
-                $createdRole->syncPermissions($permissions);
-            }
-
-            if($role == 'apoteker')
-            {
-                // $permissions = Permission::where('name', 'product: view-any')->get();
-                // $permissions = $permissions->merge(Permission::where('name', 'category: view-any')->get());
-                // $permissions = $permissions->merge(Permission::where('name', 'unit: view-any')->get());
-
-                // $createdRole->syncPermissions($permissions);
-                $createdRole->syncPermissions([
-                    'product: view-any',
-                    'product: view',
-                    'category: view-any',
-                    'unit: view-any',
+                Permission::firstOrCreate([
+                    'name'  => $permission["name"],
+                    'alias' => $permission['alias'],
+                    'group' => $permission['group'],
                 ]);
+
+                $progressBar->advance();
             }
 
-            if($role == 'kasir')
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
+
+
+            $this->command->warn(PHP_EOL . 'Creating role...');
+            $progressBar = new ProgressBar($this->command->getOutput(), count($roles));
+
+            foreach($roles as $role)
             {
-                $createdRole->syncPermissions([
-                    'product: view-any',
-                    'product: view',
-                    'category: view-any',
-                    'unit: view-any',
+                $createdRole = Role::firstOrCreate([
+                    'name' => $role,
                 ]);
-            }
-        }
 
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
-        $this->command->getOutput()->writeln('');
+                if($role == 'superuser')
+                    $createdRole->syncPermissions(Permission::all());
+
+                if($role == 'pemilik')
+                {
+                    $permissions = Permission::where('name', 'like', 'product:%')->get();
+                    $permissions = $permissions->merge(Permission::where('name', 'like', 'category:%')->get());
+                    $permissions = $permissions->merge(Permission::where('name', 'like', 'unit:%')->get());
+                    $permissions = $permissions->merge(Permission::where('name', 'like', 'location:%')->get());
+                    $permissions = $permissions->merge(Permission::where('name', 'like', 'user:%')->get());
+                    $permissions = $permissions->merge(Permission::where('name', 'like', 'role:%')->get());
+                    $createdRole->syncPermissions($permissions);
+                }
+
+                if($role == 'apoteker')
+                {
+                    // $permissions = Permission::where('name', 'product: view-any')->get();
+                    // $permissions = $permissions->merge(Permission::where('name', 'category: view-any')->get());
+                    // $permissions = $permissions->merge(Permission::where('name', 'unit: view-any')->get());
+
+                    // $createdRole->syncPermissions($permissions);
+                    $createdRole->syncPermissions([
+                        'product: view-any',
+                        'product: view',
+                        'category: view-any',
+                        'unit: view-any',
+                    ]);
+                }
+
+                if($role == 'kasir')
+                {
+                    $createdRole->syncPermissions([
+                        'product: view-any',
+                        'product: view',
+                        'category: view-any',
+                        'unit: view-any',
+                    ]);
+                }
+            }
+
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
+            $this->command->getOutput()->writeln('');
+        }
 
         $users = [
             [
@@ -334,30 +337,34 @@ class UserSeeder extends Seeder
                 ],
             ],
         ];
-        
-        $this->command->warn(PHP_EOL . 'Creating user...');
-        
-        $progressBar = new ProgressBar($this->command->getOutput(), count($users));
 
-        foreach($users as $user)
+        if(!User::exists())
         {
-            if(User::where('username', $user['username'])->count()<1)
-            {
-                $userCreated = User::firstOrCreate([
-                    'name'      => $user['name'],
-                    'username'  => $user['username'],
-                    'email'     => $user['email'],
-                    'password'  => Hash::make($user['password']),
-                ]);
-    
-                $userCreated->syncRoles($user['role']);
-                $progressBar->advance();
-            }
-            
-        }
+            $this->command->warn(PHP_EOL . 'Creating user...');
+        
+            $progressBar = new ProgressBar($this->command->getOutput(), count($users));
 
-        $progressBar->finish();
-        $this->command->getOutput()->writeln('');
-        $this->command->getOutput()->writeln('');
+            foreach($users as $user)
+            {
+                if(User::where('username', $user['username'])->count()<1)
+                {
+                    $userCreated = User::firstOrCreate([
+                        'name'      => $user['name'],
+                        'username'  => $user['username'],
+                        'email'     => $user['email'],
+                        'password'  => Hash::make($user['password']),
+                    ]);
+        
+                    $userCreated->syncRoles($user['role']);
+                    $progressBar->advance();
+                }
+                
+            }
+
+            $progressBar->finish();
+            $this->command->getOutput()->writeln('');
+            $this->command->getOutput()->writeln('');
+        }
+        
     }
 }

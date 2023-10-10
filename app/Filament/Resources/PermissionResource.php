@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PermissionResource\Pages;
 use App\Filament\Resources\PermissionResource\RelationManagers;
@@ -66,7 +67,7 @@ class PermissionResource extends Resource
                 //     Tables\Actions\EditAction::make(), 
                 //     Tables\Actions\DeleteAction::make(),
                 // ]),            
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
                 //     Tables\Actions\DeleteBulkAction::make(),
