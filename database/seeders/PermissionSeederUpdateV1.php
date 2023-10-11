@@ -116,7 +116,11 @@ class PermissionSeederUpdateV1 extends Seeder
                 $superuser->givePermissionTo($permissionCreated);
             
             if($pemilik && !$pemilik->hasPermissionTo($permissionCreated->name))
+            {
+                if($permissionCreated->group != 'Persediaan')
                 $pemilik->givePermissionTo($permissionCreated);
+            }
+                
 
             $progressBar->advance();
         }

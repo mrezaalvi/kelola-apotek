@@ -241,6 +241,7 @@ class ApotekerResource extends Resource
                             ]),
                         Infolists\Components\TextEntry::make('email')
                             ->label('Email')
+                            ->default('-')
                             ->copyable()
                             ->copyMessage('Salin!')
                             ->copyMessageDuration(1500)
@@ -249,6 +250,7 @@ class ApotekerResource extends Resource
                             ]),
                         Infolists\Components\TextEntry::make('alamat')
                             ->label('Alamat')
+                            ->default('-')
                             ->copyable()
                             ->copyMessage('Salin!')
                             ->copyMessageDuration(1500)
@@ -284,6 +286,12 @@ class ApotekerResource extends Resource
                                 ]),
                             Infolists\Components\TextEntry::make('stra_file')
                                 ->label('Berkas STRA')
+                                ->formatStateUsing(function (string $state): string {
+                                    if(!$state)
+                                        return $state;
+                                    $state = explode('/', $state);
+                                    return $state[1];
+                                })
                                 ->url(fn (Apoteker $record): string => Storage::disk('files-apotek')->url($record->stra_file))
                                 ->openUrlInNewTab()
                                 ->columnSpan([
@@ -311,6 +319,14 @@ class ApotekerResource extends Resource
                                 ]),
                             Infolists\Components\TextEntry::make('sipa_file')
                                 ->label('Berkas SIPA')
+                                ->formatStateUsing(function (string $state): string {
+                                    if(!$state)
+                                        return $state;
+                                    $state = explode('/', $state);
+                                    return $state[1];
+                                })
+                                ->url(fn (Apoteker $record): string => Storage::disk('files-apotek')->url($record->sipa_file))
+                                ->openUrlInNewTab()
                                 ->columnSpan([
                                     'lg' => 1,
                                 ]),

@@ -118,4 +118,12 @@ class RoleResource extends Resource
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
     }    
+
+    public static function getEloquentQuery(): Builder
+    {
+        if(!auth()->user()->hasRole('superuser'))
+            return parent::getEloquentQuery()->where('name','!=', 'superuser');
+
+        return parent::getEloquentQuery();
+    }
 }

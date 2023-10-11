@@ -154,6 +154,9 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('username','!=', 'superuser');
+        if(!auth()->user()->hasRole('superuser'))
+            return parent::getEloquentQuery()->where('username','!=', 'superuser');
+        
+        return parent::getEloquentQuery();
     }
 }

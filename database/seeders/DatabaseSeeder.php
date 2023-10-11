@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             LokasiSeeder::class,
             UpdatePermissionName::class,
             PermissionSeederUpdateV1::class,
+            ApotekerSeeder::class,
         ]);
     }
 }
