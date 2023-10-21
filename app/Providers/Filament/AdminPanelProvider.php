@@ -66,6 +66,11 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->navigationGroups([
+                'Persediaan',
+                'Master Data',
+                'Manajemen Pengguna',
+            ])
             ->sidebarCollapsibleOnDesktop()
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s');
