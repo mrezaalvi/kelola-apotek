@@ -98,7 +98,7 @@ class ApotekerResource extends Resource
                                             )
                                             ->acceptedFileTypes(['application/pdf'])
                                             ->downloadable()
-                                            ->disk('file-apotek')
+                                            ->disk('files-apotek')
                                             ->directory('apoteker')
                                             ->visibility('public')
                                             ->hint('Format berkas *.pdf'),
@@ -129,7 +129,7 @@ class ApotekerResource extends Resource
                                             )
                                             ->acceptedFileTypes(['application/pdf'])
                                             ->downloadable()
-                                            ->disk('file-apotek')
+                                            ->disk('files-apotek')
                                             ->directory('apoteker')
                                             ->visibility('public')
                                             ->hint('Format berkas *.pdf'),
