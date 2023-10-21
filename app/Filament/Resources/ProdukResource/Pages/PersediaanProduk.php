@@ -2,18 +2,40 @@
 
 namespace App\Filament\Resources\ProdukResource\Pages;
 
+use Filament\Forms;
 use Filament\Actions;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Support;
+use App\Models\Produk;
+use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\ProdukResource;
+use Illuminate\Contracts\Support\Htmlable;
 
-class PersediaanProduk extends ViewRecord
+class PersediaanProduk extends EditRecord
 {
     protected static string $resource = ProdukResource::class;
 
     protected static string $view = 'filament.resources.produk-resource.pages.persediaan-produk';
+
+    public function getBreadcrumb(): string
+    {
+        return static::$breadcrumb ?? __('Daftar Persediaan');
+    }
+
+    protected function authorizeAccess(): void
+    {
+        static::authorizeResourceAccess();
+
+        abort_unless(static::getResource()::canEdit($this->getRecord()), 403);
+    }
+    
+    public function getTitle(): string | Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return $this->getRecordTitle()." - Persediaan";
+    }
 
     protected function getHeaderActions(): array
     {
@@ -22,34 +44,48 @@ class PersediaanProduk extends ViewRecord
                 ->label('Kembali')
                 ->color('warning')
                 ->icon('heroicon-m-arrow-uturn-left')
-                ->url(fn()=>ProdukResource::getUrl()),           
+                ->url(fn(Produk $record)=> ProdukResource::getUrl('view', ['record' => $record])),           
         ];
     }
-
-    public function infolist(Infolist $infolist): Infolist
+    
+    public function form(Forms\Form $form): Forms\Form
     {
-        return $infolist
+        return $form
             ->schema([
-                Infolists\Components\Section::make('Informasi Produk')
-                    ->icon('heroicon-m-information-circle')
+                Forms\Components\Section::make()
                     ->schema([
-                        Infolists\Components\TextEntry::make('nama')
-                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
-                            ->weight(Support\Enums\FontWeight::Bold)
-                            ->columnSpan(2),
-                        Infolists\Components\TextEntry::make('kode')
-                            ->copyable()
-                            ->copyMessage('Salin!')
-                            ->copyMessageDuration(1500),
-                        Infolists\Components\TextEntry::make('barcode')
-                            ->copyable()
-                            ->copyMessage('Salin!')
-                            ->copyMessageDuration(1500),
-                    ])
-                    ->columns(4),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('nama')
+                                    ->autofocus(fn(string $operation)=>$operation==='edit')
+                                    ->unique(ignoreRecord: true)
+                                    ->required()
+                                    ->maxLength(150)
+                                    ->disabled()
+                                    ->columnSpan(2),
+                                Forms\Components\TextInput::make('kode')
+                                    ->label('Kode/SKU')
+                                    ->maxLength(40)
+                                    ->disabled(),
+                                Forms\Components\TextInput::make('barcode')
+                                    ->label('Barcode')
+                                    ->maxLength(40)
+                                    ->disabled(),
+                            ]),
+                    ]),
             ])
-            ->record($this->getRecord())
-            ->columns($this->hasInlineLabels() ? 1 : 2)
-            ->inlineLabel($this->hasInlineLabels());
+            ->model($this->getRecord())
+            ->statePath('data')
+            ->operation('persediaan');
+    }
+
+    /**
+     * @return array<Action | ActionGroup>
+     */
+    protected function getFormActions(): array
+    {
+        return [
+            //
+        ];
     }
 }
