@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\ProdukResource\Pages;
 
-use App\Models\Satuan;
 use Filament\Forms;
 use Filament\Pages;
+use Filament\Actions;
+use App\Models\Produk;
+use App\Models\Satuan;
 use Filament\Resources;
 use Filament\Actions\Action;
 use Filament\Support\Exceptions\Halt;
@@ -43,6 +45,17 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
 
         abort_unless(static::getResource()::canEdit($this->getRecord()), 403);
     }
+   
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\Action::make('back')
+                ->label('Kembali')
+                ->color('warning')
+                ->icon('heroicon-m-arrow-uturn-left')
+                ->url(fn()=> ProdukResource::getUrl('view', ['record' => $this->record])),            
+        ];
+    }
 
     public function form(Forms\Form $form): Forms\Form
     {
@@ -51,7 +64,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
             Forms\Components\Section::make()
                     ->schema([
                         
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('nama')
                                     ->autofocus(fn(string $operation)=>$operation==='edit')
@@ -62,6 +75,10 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                     ->columnSpan(2),
                                 Forms\Components\TextInput::make('kode')
                                     ->label('Kode/SKU')
+                                    ->maxLength(40)
+                                    ->disabled(),
+                                Forms\Components\TextInput::make('barcode')
+                                    ->label('Barcode')
                                     ->maxLength(40)
                                     ->disabled(),
                             ]),
@@ -152,9 +169,9 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                             ->defaultItems(0)
                             ->hidden(fn(Forms\Get $get)=>!$get('satuan'))
                             ->reorderable(false)
-                            ->addable(false)
-                            ->deletable(false)
-                            ->reorderableWithButtons(),
+                            // ->addable(false)
+                            // ->deletable(false)
+                            ->reorderableWithButtons(false),
                     ]),
         ])
         ->model($this->getRecord())
@@ -168,9 +185,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
             return static::$title;
         }
 
-        return __('Ubah Multi Satuan', [
-            'label' => $this->getRecordTitle(),
-        ]);
+        return $this->getRecordTitle()." - Multi Satuan";
     }
 
     /**
