@@ -124,6 +124,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                                 'nilai_konversi' => $multiple,
                                 'harga_beli' => $hargaBeli * $multiple,
                                 'harga_jual' => $hargaJual * $multiple,
+                                'created_by' => auth()->id(),
                             ]
                         );
                     }
@@ -134,39 +135,41 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
                 
                 $lokasiId = $this->getLokasiId($row['lokasi']);
                 
-                // if($produk->satuan && $lokasiId){
-                //     $persediaan = $produk->persediaan()
-                //         ->where([
-                //             'satuan_id'=>($produk->satuan)?->id, 
-                //             'lokasi_id' => $lokasiId, 
-                //             'ref' => "",
-                //             'no_batch' => $row['nobatch'],
-                //             'harga_beli' => $row['harga_beli'],
-                //         ])->first();
+                if($produk->satuan && $lokasiId){
+                    $persediaan = $produk->persediaan()
+                        ->where([
+                            'satuan_id'=>($produk->satuan)?->id, 
+                            'lokasi_id' => $lokasiId, 
+                            'ref' => "",
+                            'no_batch' => $row['nobatch'],
+                            'harga_beli' => $row['harga_beli'],
+                        ])->first();
 
-                //     if(!$persediaan)
-                //     {                       
-                //         $produk->persediaan()->firstOrCreate(
-                //             [
-                //                 'satuan_id' => ($produk->satuan)?->id,
-                //                 'lokasi_id' => $lokasiId,
-                //                 'ref' => "",
-                //                 'no_batch' => ($row['nobatch'])?trim(trim($row['nobatch'],";"),":"):$row['nobatch'], 
-                //                 'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
-                //                 'harga_beli' => ($row['harga_beli'])?$row['harga_beli']:0,                                
-                //             ],
-                //             [                                
-                //                 'stok' => ($row['stok'])?$row['stok']:0,
-                //             ]
-                //         );
-                //     }
-                //     else
-                //     {
-                //         $persediaan->stok += ($row['stok'])?$row['stok']:0; 
-                //         $persediaan->save();
-                //     }
+                    if(!$persediaan)
+                    {                       
+                        $produk->persediaan()->firstOrCreate(
+                            [
+                                'satuan_id' => ($produk->satuan)?->id,
+                                'lokasi_id' => $lokasiId,
+                                'ref' => "",
+                                'no_batch' => ($row['nobatch'])?trim(trim($row['nobatch'],";"),":"):$row['nobatch'], 
+                                'tgl_exp' => (trim($row['ed']))?Carbon::createFromFormat('d/m/Y', $row['ed'])->format('Y-m-d'):null,
+                                'harga_beli' => ($row['harga_beli'])?$row['harga_beli']:0,
+                            ],
+                            [                                
+                                'stok' => ($row['stok'])?$row['stok']:0,
+                                'created_by' => auth()->id(),
+                            ]
+                        );
+                    }
+                    else
+                    {
+                        $persediaan->stok += ($row['stok'])?$row['stok']:0;
+                        $persediaan->last_edited_by = auth()->id(); 
+                        $persediaan->save();
+                    }
 
-                // }
+                }
                 
 
             }
