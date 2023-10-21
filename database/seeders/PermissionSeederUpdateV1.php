@@ -37,11 +37,11 @@ class PermissionSeederUpdateV1 extends Seeder
                 'alias' =>  'Ubah Data Persediaan',
                 'group' =>  'Persediaan',
             ],
-            // [
-            //     'name'  =>  'stock: delete',
-            //     'alias' =>  'Hapus Data Persediaan',
-            //     'group' =>  'Persediaan',
-            // ],
+            [
+                'name'  =>  'stock: delete',
+                'alias' =>  'Hapus Data Persediaan',
+                'group' =>  'Persediaan',
+            ],
 
             // Supplier Permission
             [
@@ -95,6 +95,12 @@ class PermissionSeederUpdateV1 extends Seeder
                 'name'  =>  'apoteker: delete',
                 'alias' =>  'Hapus Data Apoteker',
                 'group' =>  'Data Apoteker',
+            ],
+
+            [
+                'name'  =>  'settings: apotek-profile',
+                'alias' =>  'Pengaturan Profil Apotek',
+                'group' =>  'Pengaturan',
             ],
         ];
 
