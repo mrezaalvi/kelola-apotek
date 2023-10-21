@@ -121,6 +121,7 @@ class ProdukResource extends Resource
                             ])
                             ->defaultItems(0)
                             ->hidden(fn(Forms\Get $get)=>!$get('satuan'))
+                            ->hiddenOn('edit')
                             ->reorderable(false)
                             ->reorderableWithButtons(),
 
@@ -313,6 +314,7 @@ class ProdukResource extends Resource
                 Tables\Columns\TextColumn::make('kode')
                     ->label('Kode/SKU')
                     ->searchable()
+                    ->default('-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable()
@@ -328,19 +330,22 @@ class ProdukResource extends Resource
                     ->badge()
                     ->separator(',')
                     ->default('-'),
+                // Tables\Columns\TextColumn::make('persediaan_count')
+                //     ->counts('persediaan')
+                //     ->label('Stok yang tersedia')
+                //     ->alignCenter(),
                 Tables\Columns\TextColumn::make('minimal_stok')
                     ->numeric()
-                    ->alignment(Alignment::Center)
+                    ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_beli')
                     ->money('idr')
-                    ->alignment(Alignment::Center)
+                    ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('pabrik')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('digunakan')
@@ -415,7 +420,7 @@ class ProdukResource extends Resource
                             $records->each(function($record){
                                 DB::transaction(function () use ($record) {
                                     $record->kategories()->detach();
-                                    $record->multiSatuan()->delete();L; -
+                                    $record->multiSatuan()->delete();
                                      
                                     $record->persediaan()->delete();
                                     $record->delete();
