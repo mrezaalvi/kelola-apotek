@@ -396,11 +396,13 @@ class ProdukResource extends Resource
                         ->label('Multi Satuan')
                         ->icon('heroicon-m-square-3-stack-3d')
                         ->color('primary')
+                        ->hidden(fn(Produk $produk)=>!$produk->satuan_id)
                         ->url(fn(Produk $produk)=> ProdukResource::getUrl('multisatuan', ['record' => $produk])),
                     Tables\Actions\Action::make('persediaan')
                         ->label('Persediaan')
                         ->icon('heroicon-m-archive-box')
                         ->color('primary')
+                        ->hidden(fn(Produk $produk)=>!$produk->satuan_id)
                         ->url(fn(Produk $produk)=>ProdukResource::getUrl('persediaan', ['record' => $produk])),
                     Tables\Actions\EditAction::make()
                         ->color('primary'),

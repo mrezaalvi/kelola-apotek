@@ -47,10 +47,10 @@ class PersediaanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('produks.nama')
-                    ->label('Nama Produk'),
-                Tables\Columns\TextColumn::make('satuans.nama')
-                    ->label('Satuan'),
+                // Tables\Columns\TextColumn::make('produks.nama')
+                //     ->label('Nama Produk'),
+                // Tables\Columns\TextColumn::make('satuans.nama')
+                //     ->label('Satuan'),
                 Tables\Columns\TextColumn::make('lokasis.nama')
                     ->label('Lokasi'),
                 Tables\Columns\TextColumn::make('no_batch')
@@ -79,7 +79,7 @@ class PersediaanResource extends Resource
                     ->collapsible(),
             ])
             ->defaultGroup('produks.nama')
-            ->groupsOnly()
+            // ->groupsOnly()
             ->filters([
                 //
             ])

@@ -71,15 +71,18 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                     ->unique(ignoreRecord: true)
                                     ->required()
                                     ->maxLength(150)
+                                    ->extraAttributes(['class'=>'bg-white'])
                                     ->disabled()
                                     ->columnSpan(2),
                                 Forms\Components\TextInput::make('kode')
                                     ->label('Kode/SKU')
                                     ->maxLength(40)
+                                    ->extraAttributes(['class'=>'bg-white'])
                                     ->disabled(),
                                 Forms\Components\TextInput::make('barcode')
                                     ->label('Barcode')
                                     ->maxLength(40)
+                                    ->extraAttributes(['class'=>'bg-white'])
                                     ->disabled(),
                             ]),
                         Forms\Components\Select::make('satuan')
@@ -88,7 +91,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                             ->searchable()
                             ->preload()
                             ->disabled()
-                            ->extraAttributes(['class' => 'max-w-xs']),
+                            ->extraAttributes(['class' => 'max-w-xs bg-white']),
                         Forms\Components\Grid::make()
                             ->schema([                            
                                 Forms\Components\TextInput::make('harga_beli')
@@ -96,7 +99,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                     ->numeric()           
                                     ->placeholder('0,00')
                                     ->live(onBlur: true)
-                                    ->extraInputAttributes(['class' => 'text-end'])
+                                    ->extraInputAttributes(['class' => 'text-end bg-white'])
                                     ->disabled(),
 
                                 Forms\Components\TextInput::make('harga_jual')
@@ -113,13 +116,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                         return "Margin : ".$marginHarga."%";
                                     })
                                     ->hintColor('info')          
-                                    ->extraInputAttributes(function(Forms\Get $get){
-                                        $attribute = ['class' => 'text-end'];
-                                        $readOnlyAttribute = ['class'=>'text-end bg-gray-200','readonly' => 'true'];
-                                        if($get('use_margin'))
-                                            $attribute = $readOnlyAttribute;
-                                        return $attribute;
-                                    })
+                                    ->extraInputAttributes(['class' => 'text-end bg-white'])
                                     ->disabled(),
                             ]),
                         Forms\Components\Repeater::make('multiSatuan')
@@ -149,6 +146,18 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                             ->placeholder('0')
                                             ->extraInputAttributes(['class' => 'text-end'])
                                             ->required()
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
+                                                $nilaiKonversi = ($state)?floatval($state):0;
+                                                $hargaBeliSatuan = floatval($get('../../harga_beli'));
+                                                $hargaJualSatuan = floatval($get('../../harga_jual'));
+                                                if(!$nilaiKonversi){
+                                                    $set('harga_beli', 0);
+                                                    $set('harga_jual', 0);
+                                                }
+                                                $set('harga_beli', $hargaBeliSatuan * $nilaiKonversi);
+                                                $set('harga_jual', $hargaJualSatuan * $nilaiKonversi);
+                                            })
                                             ->suffix(
                                                 fn(Forms\Get $get)=>
                                                     $get('../../satuan')?Satuan::find($get('../../satuan'))->nama:'satuan'),
@@ -156,7 +165,7 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                             ->label('Harga Beli')
                                             ->numeric()
                                             ->placeholder('0')
-                                            ->extraInputAttributes(['class' => 'text-end'])
+                                            ->extraInputAttributes(['class' => 'text-end', 'read-only' => true])
                                             ->required(),
                                         Forms\Components\TextInput::make('harga_jual')
                                             ->label('Harga Jual')

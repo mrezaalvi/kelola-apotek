@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProdukResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Satuan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\Enums\Alignment;
@@ -28,11 +29,13 @@ class PersediaanRelationManager extends RelationManager
                                 'lg' => 2,
                             ])
                             ->schema([
-                                Forms\Components\Select::make('satuans')
+                                Forms\Components\Select::make('satuan_id')
                                     ->label('Satuan')
-                                    ->relationship('satuans','nama')
-                                    ->required(),
-                                Forms\Components\Select::make('lokasis')
+                                    // ->relationship('satuans','nama')
+                                    ->options(
+                                        Satuan::all()->pluck('nama', 'id')
+                                    ),
+                                Forms\Components\Select::make('lokasi_id')
                                     ->label('Lokasi')
                                     ->relationship('lokasis','nama')
                                     ->required(),
@@ -105,7 +108,16 @@ class PersediaanRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->label('Tambah Batch')
-                    ->icon('heroicon-m-plus'),
+                    ->icon('heroicon-m-plus')
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['created_by'] = auth()->id();
+                        $data['ref'] = null;
+                        return $data;
+                    })
+                    ->using(function (array $data, string $model): Model {
+                        dd($data);
+                        return $model::create($data);
+                    }),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
