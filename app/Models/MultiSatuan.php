@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Produk;
 use App\Models\Satuan;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ class MultiSatuan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['produk_id', 'satuan_lanjutan', 'nilai_konversi', 'harga_beli','harga_jual', 'diskon', 'diskon2'];
+    protected $fillable = ['produk_id', 'satuan_lanjutan', 'nilai_konversi', 'harga_beli','harga_jual', 'diskon', 'diskon2', 'created_by', 'last_edited_by'];
 
     public function hargaBeli(): Attribute
     {
@@ -62,5 +63,17 @@ class MultiSatuan extends Model
     {
         return $this->belongsTo(Satuan::class, 'satuan_lanjutan');
     }
+
+    public function createdBy(): BelongsTo    
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function lastEditedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'last_edited_by');
+    }
+
+    
 
 }
