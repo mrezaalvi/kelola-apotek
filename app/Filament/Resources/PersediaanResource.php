@@ -53,15 +53,11 @@ class PersediaanResource extends Resource
                     ->label('Satuan'),
                 Tables\Columns\TextColumn::make('lokasis.nama')
                     ->label('Lokasi'),
-                Tables\Columns\TextColumn::make('stok')
-                    ->label('Stok yang tersedia')
-                    ->numeric()
-                    ->alignment(Alignment::Center),
                 Tables\Columns\TextColumn::make('no_batch')
                     ->label('Nomor Batch')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tgl_exp')
-                    ->label('Tanggal Expired')
+                    ->label('Tanggal Kadaluarsa')
                     ->alignment(Alignment::Center)
                     ->date('d/m/Y')
                     ->sortable(),
@@ -69,6 +65,12 @@ class PersediaanResource extends Resource
                     ->money('idr')
                     ->alignment(Alignment::Center)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('stok')
+                    ->label('Jumlah Stok')
+                    ->numeric()
+                    ->alignment(Alignment::Center)
+                    ->summarize(Tables\Columns\Summarizers\Sum::make()->label('Total Stok')),
+                
             ])
             ->defaultSort('no_batch')
             ->groups([
@@ -77,6 +79,7 @@ class PersediaanResource extends Resource
                     ->collapsible(),
             ])
             ->defaultGroup('produks.nama')
+            ->groupsOnly()
             ->filters([
                 //
             ])
@@ -91,6 +94,8 @@ class PersediaanResource extends Resource
                     //      ->hidden(! auth()->user()->can('stok: delete')),
                 ]),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->poll('10s');
     }
     
