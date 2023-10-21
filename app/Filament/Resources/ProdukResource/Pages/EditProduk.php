@@ -13,10 +13,17 @@ class EditProduk extends EditRecord
 {
     protected static string $resource = ProdukResource::class;
 
+    protected static string $view = 'filament.resources.produk-resource.pages.edit-produk';
+
     protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),
+            Actions\Action::make('back')
+                ->label('Kembali')
+                ->color('warning')
+                ->icon('heroicon-m-arrow-uturn-left')
+                ->url(fn()=> ProdukResource::getUrl('view', ['record' => $this->record])), 
         ];
     }
 

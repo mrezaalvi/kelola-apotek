@@ -27,6 +27,12 @@ class ViewProduk extends ViewRecord
                     ->icon('heroicon-m-square-3-stack-3d')
                     ->outlined()
                     ->url(fn()=>$this->getResource()::getUrl('multisatuan', ['record'=>$this->record])),
+                Actions\Action::make('edit-persediaan')
+                    ->label('Persediaan')
+                    ->color('primary')
+                    ->icon('heroicon-m-square-3-stack-3d')
+                    ->outlined()
+                    ->url(fn()=>$this->getResource()::getUrl('persediaan', ['record'=>$this->record])),
                 Actions\EditAction::make()
                     ->label('Ubah')
                     ->color('primary')
