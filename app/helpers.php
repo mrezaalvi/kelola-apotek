@@ -1,5 +1,7 @@
 <?php
 
+use App\Settings\ProfileApotekSettings;
+
     if(!function_exists('toDecimalDBFormat')){
         function toDBDecimalFormat(string | int | float | null $numeric=null){
             if(!$numeric || empty(trim($numeric)))
@@ -24,5 +26,19 @@
                 if($commaPos < $pointPos)
                     return floatval(str_replace(",", "", $numeric));
             }
+        }
+    }
+
+    if(!function_exists('apotekName')){
+        function apotekName(){
+            $profilApotek = new ProfileApotekSettings(); 
+            return $profilApotek->nama_apotek;
+        }
+    }
+
+    if(!function_exists('apotekLogo')){
+        function apotekLogo(){
+            $profilApotek = new ProfileApotekSettings();
+            return $profilApotek->logo;
         }
     }
