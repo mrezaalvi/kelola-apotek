@@ -241,7 +241,7 @@ class ProdukImport implements ToCollection, WithHeadingRow, WithStartRow
 
     public function getKategoriId(?string $kategoriNamaList):array
     {
-        if(empty($kategoriNamaList))
+        if(empty(trim($kategoriNamaList)))
             return [];
         $kategoriNamaArr = explode(';',trim($kategoriNamaList));
         $kategoriId = [];
