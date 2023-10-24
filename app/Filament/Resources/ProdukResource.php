@@ -2,24 +2,25 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Produk;
-use App\Models\Satuan;
-use App\Filament\Resources\ProdukResource\Pages;
-use App\Filament\Resources\ProdukResource\RelationManagers;
-
 use Filament\Forms;
+use Filament\Tables;
+use Filament\Support;
+use App\Models\Produk;
+
+use App\Models\Satuan;
 use Filament\Infolists;
+use Filament\Support\RawJs;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Support;
-use Filament\Support\Enums\Alignment;
-use Filament\Support\RawJs;
-use Filament\Tables;
-use Filament\Tables\Enums\ActionsPosition;
-
+use Illuminate\Database\Eloquent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
-use Illuminate\Database\Eloquent;
+use Filament\Support\Enums\Alignment;
+
+use Illuminate\Validation\Rules\Unique;
+use Filament\Tables\Enums\ActionsPosition;
+use App\Filament\Resources\ProdukResource\Pages;
+use App\Filament\Resources\ProdukResource\RelationManagers;
 
 class ProdukResource extends Resource
 {
@@ -50,15 +51,18 @@ class ProdukResource extends Resource
                         Forms\Components\TextInput::make('nama')
                             ->autofocus(fn(string $operation)=>$operation==='edit')
                             ->unique(ignoreRecord: true)
+                            ->autocomplete(false)
                             ->required()
                             ->maxLength(150),
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('kode')
                                     ->label('Kode/SKU')
+                                    ->autocomplete(false)
                                     ->maxLength(40),
                                 Forms\Components\TextInput::make('barcode')
                                     ->maxLength(50)
+                                    ->autocomplete(false)
                                     ->suffixIcon('heroicon-m-view-columns'),
                             ]),
 
@@ -112,6 +116,7 @@ class ProdukResource extends Resource
                                             ->label('Nilai Konversi')
                                             ->numeric()
                                             ->placeholder('0')
+                                            ->autocomplete(false)
                                             ->extraInputAttributes(['class' => 'text-end'])
                                             ->required()
                                             ->suffix(
@@ -128,10 +133,12 @@ class ProdukResource extends Resource
                         
                         Forms\Components\Textarea::make('deskripsi')
                             ->rows(2)
+                            ->autocomplete(false)
                             ->maxLength(255),
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\TextInput::make('pabrik'),
+                                Forms\Components\TextInput::make('pabrik')
+                                    ->autocomplete(false),
                                 Forms\Components\TextInput::make('kemasan')
                                     ->disabled()
                                     ->dehydrated(false),
@@ -142,6 +149,7 @@ class ProdukResource extends Resource
                             ->numeric()
                             ->placeholder('0')
                             ->default(0)
+                            ->autocomplete(false)
                             ->extraAttributes(['class' => 'max-w-xs'])
                             ->extraInputAttributes(['class' => 'text-end']),
                         Forms\Components\Grid::make()
@@ -149,6 +157,7 @@ class ProdukResource extends Resource
                                 Forms\Components\TextInput::make('margin_harga')
                                     ->label('Margin')
                                     ->numeric()
+                                    ->autocomplete(false)
                                     ->placeholder('0,00')
                                     ->suffix('%')
                                     ->live(onBlur: true)
@@ -200,7 +209,8 @@ class ProdukResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('harga_beli')
                                     ->label('Harga Beli')
-                                    ->numeric()            
+                                    ->numeric()         
+                                    ->autocomplete(false)   
                                     ->placeholder('0,00')
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state) {
@@ -226,6 +236,7 @@ class ProdukResource extends Resource
                                 Forms\Components\TextInput::make('harga_jual')
                                     ->label('Harga Jual')
                                     ->numeric()
+                                    ->autocomplete(false)
                                     ->placeholder('0,00')
                                     ->live()
                                     ->hint(function(Forms\Get $get){
@@ -257,7 +268,8 @@ class ProdukResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('diskon')
                                             ->label('Diskon/Potongan Pertama')
-                                            ->numeric()                                    
+                                            ->numeric()   
+                                            ->autocomplete(false)                                 
                                             ->placeholder('0,00')
                                             ->suffix('%')
                                             ->live()
@@ -274,7 +286,8 @@ class ProdukResource extends Resource
                                             ->extraInputAttributes(['class' => 'text-end']),
                                     Forms\Components\TextInput::make('diskon2')
                                         ->label('Diskon/Potongan Kedua (Optional)')
-                                        ->numeric()                                    
+                                        ->numeric()  
+                                        ->autocomplete(false)                                  
                                         ->placeholder('0,00')
                                         ->suffix('%')
                                         ->live()
