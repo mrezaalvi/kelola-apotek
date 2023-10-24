@@ -132,6 +132,12 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
                                                 fn(Builder $query, Forms\Get $get) 
                                                     => $query->where('id', '!=', $get('../../satuan')) 
                                             )
+                                            // ->relationship(
+                                            //     'satuan', 
+                                            //     'nama',
+                                            //     fn(Builder $query, Forms\Get $get) 
+                                            //         => $query->where('id', '!=', $get('../../satuan')) 
+                                            // )
                                             ->searchable()
                                             ->preload()
                                             ->required()
