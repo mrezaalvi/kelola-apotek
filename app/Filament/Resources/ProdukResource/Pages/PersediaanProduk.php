@@ -21,6 +21,12 @@ class PersediaanProduk extends EditRecord
         return static::$breadcrumb ?? __('Daftar Persediaan');
     }
 
+    public function mount(int | string $record):void
+    {
+        parent::mount($record);
+        abort_unless($this->record->satuan_id, 404);        
+    }
+
     protected function authorizeAccess(): void
     {
         static::authorizeResourceAccess();

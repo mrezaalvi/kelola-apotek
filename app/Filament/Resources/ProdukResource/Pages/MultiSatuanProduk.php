@@ -34,6 +34,8 @@ class MultiSatuanProduk extends Resources\Pages\Page implements Forms\Contracts\
     {
         $this->record = $this->resolveRecord($record);
      
+        abort_unless($this->record->satuan_id, 404);
+
         $this->form->fill($this->record->attributesToArray());
 
         $this->previousUrl = url()->previous();
