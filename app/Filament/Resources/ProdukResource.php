@@ -89,7 +89,8 @@ class ProdukResource extends Resource
                                         Forms\Components\TextInput::make('nama')
                                             ->unique(ignoreRecord: true)
                                             ->required(),
-                                    ]),
+                                    ])
+                                    ->required(),
                             ]),
                         Forms\Components\Repeater::make('multiSatuan')
                             ->relationship()
