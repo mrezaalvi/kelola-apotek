@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProdukResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Produk;
 use App\Models\Satuan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -33,7 +34,17 @@ class PersediaanRelationManager extends RelationManager
                                     ->label('Satuan')
                                     // ->relationship('satuans','nama')
                                     ->options(
-                                        Satuan::all()->pluck('nama', 'id')
+                                        // Satuan::all()->pluck('nama', 'id')
+                                        function(){
+                                            $satuanId = [];
+                                            if($this->ownerRecord->satuan_id)
+                                                $satuanId = collect($this->ownerRecord->satuan_id);
+                                            
+                                            if($this->ownerRecord->multiSatuan()->count()>0)
+                                                $satuanId = $satuanId->merge($this->ownerRecord->multiSatuan()->pluck('satuan_lanjutan'));
+                                            return Satuan::whereIn('id', $satuanId)->pluck('nama','id');
+                                             
+                                        }
                                     ),
                                 Forms\Components\Select::make('lokasi_id')
                                     ->label('Lokasi')
