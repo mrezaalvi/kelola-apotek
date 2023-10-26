@@ -96,7 +96,6 @@ class PermissionSeederUpdateV1 extends Seeder
                 'alias' =>  'Hapus Data Apoteker',
                 'group' =>  'Data Apoteker',
             ],
-
             [
                 'name'  =>  'settings: apotek-profile',
                 'alias' =>  'Pengaturan Profil Apotek',
@@ -123,7 +122,6 @@ class PermissionSeederUpdateV1 extends Seeder
             
             if($pemilik && !$pemilik->hasPermissionTo($permissionCreated->name))
             {
-                if($permissionCreated->group != 'Persediaan')
                 $pemilik->givePermissionTo($permissionCreated);
             }
                 
